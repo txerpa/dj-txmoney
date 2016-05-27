@@ -1,0 +1,26 @@
+# http://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+quote_type = single
+not_skip = __init__.py
+multi_line_output = 5
+known_django = django
+known_first_party = txmoney
+default_section = THIRDPARTY
+sections = FUTURE ,STDLIB, THIRDPARTY, DJANGO, FIRSTPARTY, LOCALFOLDER
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab

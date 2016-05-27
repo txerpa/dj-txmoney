@@ -1,0 +1,4 @@
+[run]
+include = txmoney/*
+omit = *migrations*, txmoney/__init__.py, txmoney/settings.py
+
