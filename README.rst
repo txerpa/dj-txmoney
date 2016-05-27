@@ -8,7 +8,7 @@ dj-txmoney
 .. image:: https://travis-ci.org/mcanaves/dj-txmoney.png?branch=master
     :target: https://travis-ci.org/mcanaves/dj-txmoney
 
-Package for working with money and currencies.
+Package for working with money and currencies with automatic rate updates.
 
 Documentation
 -------------
