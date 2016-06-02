@@ -27,7 +27,9 @@ USER_SETTINGS = getattr(settings, str('TXMONEY'), None)
 
 DEFAULTS = {
     'DEFAULT_BACKEND': 'txmoney.backends.OpenExchangeBackend',
-    'BASE_CURRENCY': 'EUR',
+    'BACKEND_KEY': '',
+    'BASE_CURRENCY': 'USD',
+    'SAME_BASE_CURRENCY': True,
 
     'OPENEXCHANGE_NAME': 'openexchangerates.org',
     'OPENEXCHANGE_URL': 'https://openexchangerates.org/api/latest.json',
@@ -90,7 +92,7 @@ class TXMoneySettings:
 
     def __getattr__(self, attr):
         if attr not in self.defaults.keys():
-            raise AttributeError('Invalid txmoney setting: "{}'.format(attr))
+            raise AttributeError('Invalid txmoney setting: "{}"'.format(attr))
 
         try:
             # Check if present in user settings
