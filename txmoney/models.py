@@ -7,13 +7,12 @@ from decimal import Decimal
 from django.db import models
 from django.utils.functional import cached_property
 
-from txmoney.exceptions import RateDoesNotExist
-from txmoney.settings import txmoney_settings as settings
+from .exceptions import RateDoesNotExist
+from .settings import txmoney_settings as settings
 
 
 class RateSource(models.Model):
     name = models.CharField(max_length=100)
-    # TODO: add currency validation
     base_currency = models.CharField(max_length=3, default=settings.BASE_CURRENCY, blank=True)
     last_update = models.DateTimeField(auto_now=True, blank=True)
 
@@ -34,7 +33,6 @@ class RateQuerySet(models.QuerySet):
         :param currency_date: ratio currency.
         :return: Currency
         """
-        # TODO: validate if currency exist
         currency_date = currency_date if currency_date else date.today()
         try:
             # TODO: check if rate if updated else update
@@ -50,15 +48,17 @@ class RateQuerySet(models.QuerySet):
 
 class Rate(models.Model):
     source = models.ForeignKey(RateSource, on_delete=models.PROTECT, related_name='rates', related_query_name='rate')
-    # TODO: add currency validation
     currency = models.CharField(max_length=3, unique_for_date='date')
     value = models.DecimalField(max_digits=14, decimal_places=6)
     date = models.DateField(auto_now_add=True, blank=True)
 
     objects = RateQuerySet.as_manager()
 
-    @classmethod
-    def get_ratio(cls, from_currency, to_currency, ratio_date=None):
+    class Meta:
+        unique_together = ('source', 'currency', 'date')
+
+    @staticmethod
+    def get_ratio(from_currency, to_currency, ratio_date=None):
         """
         Calculate exchange ratio between two currencies for a date
         :param from_currency: base currency.
