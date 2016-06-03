@@ -27,7 +27,7 @@ try:
         TXMONEY={
             'BACKEND_KEY': 'bd1c4da0260242ad8807b2a8f0720750',  # TODO: anadir a variable de entorno
             'BASE_CURRENCY': 'USD',
-        }
+        },
     )
 
     try:
@@ -48,7 +48,7 @@ except ImportError:
 
 def run_tests(*test_args):
     if not test_args:
-        test_args = ['tests']
+        test_args = ['--cov-config', '.coveragerc', '--cov=txmoney', 'tests']
 
     failures = pytest.main(test_args)
 
