@@ -13,7 +13,7 @@ install: pip install -r requirements_test.txt
 services:
   - postgresql
 
-script: python runtests.py "--cov-config .coveragerc --cov=txmoney"
+script: python runtests.py
 
 after_success:
   - codecov
