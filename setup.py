@@ -15,7 +15,7 @@ from setuptools.command.test import test as test_command
 class PyTest(test_command):
     def finalize_options(self):
         test_command.finalize_options(self)
-        self.test_args = ['tests']
+        self.test_args = ['tests', '--cov-config', '.coveragerc', '--cov', 'txmoney']
         self.test_suite = True
 
     def run_tests(self):
@@ -59,9 +59,8 @@ keywords = 'dj-txmoney money currency finance'.split()
 tests_require = [
     'pytest-django',
     'pytest-cov',
-    'pytest-sugar',
     'tox',
-    'django >=1.9',
+    'django >=1.8',
     'psycopg2',
     'six',
     'wheel',
@@ -73,11 +72,11 @@ tests_require = [
 
 requirements = [
     'six',
-    'celery'  # TODO: solo si se usa
 ]
 
 extras_require = {
-    'django': ['Django >= 1.8', ],
+    'Django fields': ['Django >= 1.8', ],
+    'Automatic rates update': ['celery']
 }
 
 setup(
