@@ -2,16 +2,14 @@
 from __future__ import absolute_import, unicode_literals
 
 import pytest
-from tests.testapp.models import (
-    ALL_PARAMETRIZED_MODELS, MoneyModelDefaults, NullableMoneyModel,
-    SimpleMoneyModel
-)
 
 from django.db import IntegrityError
 
 from txmoney.exceptions import NotSupportedLookup
 from txmoney.money import CURRENCIES, Money
 from txmoney.settings import txmoney_settings as settings
+
+from .testapp.models import ALL_PARAMETRIZED_MODELS, MoneyModelDefaults, NullableMoneyModel, SimpleMoneyModel
 
 
 def assertsamecurrency(moneys, currency_code=None):
@@ -23,7 +21,7 @@ def assertsamecurrency(moneys, currency_code=None):
 
 
 @pytest.mark.django_db
-class TestMoneyField:
+class TestMoneyField(object):
     def test_non_null(self):
         instance = SimpleMoneyModel()
         with pytest.raises(IntegrityError):

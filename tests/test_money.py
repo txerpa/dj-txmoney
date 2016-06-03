@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from txmoney.exceptions import CurrencyMismatch, IncorrectMoneyInputError, CurrencyDoesNotExist
+from txmoney.exceptions import CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError
 from txmoney.money import CURRENCIES, Currency, Money
 from txmoney.settings import txmoney_settings as settings
 
@@ -213,6 +213,13 @@ class TestMoney(object):
         (lambda: - Money('100'), Money('-100')),
         (lambda: - Money('100.12', 'EUR'), Money('-100.12', 'EUR')),
         (lambda: + Money('100'), Money('100')),
+
+        # Absolute value
+        (lambda: abs(Money('-100')), Money('100')),
+        (lambda: abs(Money('-100.12', 'EUR')), Money('100.12', 'EUR')),
+        (lambda: abs(Money('0')), Money('0')),
+        (lambda: abs(Money('100')), Money('100')),
+        (lambda: abs(Money('100.12', 'EUR')), Money('100.12', 'EUR')),
     ]
 
     @pytest.mark.parametrize('value,expected', MONEY_ARITHMETIC)

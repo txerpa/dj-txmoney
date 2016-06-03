@@ -15,7 +15,7 @@ quote_type = single
 not_skip = __init__.py
 multi_line_output = 5
 known_django = django
-known_first_party = txmoney
+known_first_party = txmoney, tests
 default_section = THIRDPARTY
 sections = FUTURE ,STDLIB, THIRDPARTY, DJANGO, FIRSTPARTY, LOCALFOLDER
 

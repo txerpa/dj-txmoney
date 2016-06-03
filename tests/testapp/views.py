@@ -1,10 +1,9 @@
 from __future__ import print_function
 
-from tests.testapp.models import SimpleMoneyModel
-
 from django import forms
 from django.shortcuts import get_object_or_404, render_to_response
 
+from tests.testapp.models import SimpleMoneyModel
 from txmoney.forms import MoneyField
 from txmoney.money import Money
 from txmoney.settings import txmoney_settings as settings
