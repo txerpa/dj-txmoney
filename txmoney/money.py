@@ -202,6 +202,9 @@ class Money(object):
     def __neg__(self):
         return self.__class__(-self._amount, self._currency)
 
+    def __abs__(self):
+        return Money(amount=abs(self._amount), currency=self._currency)
+
     def __add__(self, other):
         if isinstance(other, Money):
             self._currency_check(other)
