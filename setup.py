@@ -4,25 +4,7 @@ import os
 import re
 import sys
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-from setuptools.command.test import test as test_command
-
-
-class PyTest(test_command):
-    def finalize_options(self):
-        test_command.finalize_options(self)
-        self.test_args = ['tests', '--cov-config', '.coveragerc', '--cov', 'txmoney']
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
+from setuptools import find_packages, setup
 
 
 def get_version(*file_paths):
@@ -56,51 +38,23 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 keywords = 'dj-txmoney money currency finance'.split()
 
-tests_require = [
-    'pytest-django',
-    'pytest-cov',
-    'tox',
-    'django >=1.8',
-    'psycopg2',
-    'six',
-    'wheel',
-    'bumpversion',
-    'isort',
-    'pylint-django',
-    'pylint-common'
-]
-
-requirements = [
-    'six',
-]
-
-extras_require = {
-    'Django fields': ['Django >= 1.8', ],
-    'Automatic rates update': ['celery']
-}
-
 setup(
-    name='dj-txmoney',
+    name='txmoney',
     version=version,
     description='Adds support for working with money, currencies and rates.',
     long_description=readme + '\n\n' + history,
     author='Mateu Cànaves Albertí',
     author_email='mateu.canaves@gmail.com',
     url='https://github.com/txerpa/dj-txmoney',
-    packages=[
-        'txmoney',
-    ],
+    package_dir={'': 'txmoney'},
+    packages=find_packages('txmoney'),
     include_package_data=True,
+    install_requires=[],
     license='BSD',
-    platforms=['any'],
     zip_safe=False,
     keywords=keywords,
-    install_requires=requirements,
-    tests_require=tests_require,
-    extras_require=extras_require,
-    cmdclass={'test': PyTest},
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Framework :: Django',
         'Framework :: Django :: 1.8',
         'Framework :: Django :: 1.9',
@@ -110,8 +64,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
 )

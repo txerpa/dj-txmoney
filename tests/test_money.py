@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from txmoney.exceptions import CurrencyMismatch, IncorrectMoneyInputError, CurrencyDoesNotExist
+from txmoney.exceptions import CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError
 from txmoney.money import CURRENCIES, Currency, Money
 from txmoney.settings import txmoney_settings as settings
 

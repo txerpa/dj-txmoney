@@ -3,13 +3,17 @@ from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest.mock import patch
 
 from django.test import TestCase
 
 from txmoney.exceptions import RateDoesNotExist
 from txmoney.models import Rate, RateSource
 from txmoney.settings import txmoney_settings as settings
+
+try:
+    from mock import patch
+except NameError:
+    from unittest.mock import patch
 
 
 class TestRateSource(TestCase):
