@@ -4,7 +4,10 @@ import os
 import re
 import sys
 
-from setuptools import find_packages, setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 
 def get_version(*file_paths):
@@ -27,27 +30,22 @@ if sys.argv[-1] == 'publish':
     os.system('python setup.py bdist_wheel upload')
     sys.exit()
 
-if sys.argv[-1] == 'tag':
-    print("Tagging the version on github:")
-    os.system("git tag -a %s -m 'version %s'" % (version, version))
-    os.system("git push --tags")
-    sys.exit()
-
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
-keywords = 'dj-txmoney money currency finance'.split()
+keywords = 'dj-txmoney txmoney money currency finance'.split()
 
 setup(
-    name='txmoney',
+    name='dj-txmoney',
     version=version,
     description='Adds support for working with money, currencies and rates.',
     long_description=readme + '\n\n' + history,
     author='Mateu Cànaves Albertí',
     author_email='mateu.canaves@gmail.com',
     url='https://github.com/txerpa/dj-txmoney',
-    package_dir={'': 'txmoney'},
-    packages=find_packages('txmoney'),
+    packages=[
+        'txmoney',
+    ],
     include_package_data=True,
     install_requires=[],
     license='BSD',
