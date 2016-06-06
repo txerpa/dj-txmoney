@@ -33,7 +33,7 @@ if sys.argv[-1] == 'publish':
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
-keywords = 'dj-txmoney money currency finance'.split()
+keywords = 'dj-txmoney txmoney money currency finance'.split()
 
 setup(
     name='dj-txmoney',
