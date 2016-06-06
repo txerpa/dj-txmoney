@@ -4,7 +4,10 @@ import os
 import re
 import sys
 
-from setuptools import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 
 def get_version(*file_paths):
@@ -33,14 +36,16 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 keywords = 'dj-txmoney money currency finance'.split()
 
 setup(
-    name='txmoney',
+    name='dj-txmoney',
     version=version,
     description='Adds support for working with money, currencies and rates.',
     long_description=readme + '\n\n' + history,
     author='Mateu Cànaves Albertí',
     author_email='mateu.canaves@gmail.com',
     url='https://github.com/txerpa/dj-txmoney',
-    package_dir={'': 'txmoney'},
+    packages=[
+        'txmoney',
+    ],
     include_package_data=True,
     install_requires=[],
     license='BSD',
