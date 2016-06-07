@@ -39,7 +39,7 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
         return self._base_currency
 
     @abstractmethod
-    def get_rates(self):
+    def get_rates_from_source(self):
         """
         Return a dictionary that maps currency code with its rate value
         """
@@ -54,7 +54,7 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
 
             if created or not source.is_updated:
                 rates = []
-                for currency, value in iteritems(self.get_rates()):
+                for currency, value in iteritems(self.get_rates_from_source()):
                     rates.append(Rate(source=source, currency=currency, value=value))
 
                 Rate.objects.bulk_create(rates)
@@ -78,14 +78,14 @@ class OpenExchangeBackend(BaseRateBackend):
 
         self.url = '{}?app_id={}'.format(settings.OPENEXCHANGE_URL, settings.BACKEND_KEY)
 
-    def get_rates(self):
+    def get_rates_from_source(self):
         try:
             data = urlopen(self.url).read().decode("utf-8")
             rates = json.loads(data, parse_float=Decimal)['rates']
             # rates = clean_rates(rates) TODO: clean rates
 
             if settings.SAME_BASE_CURRENCY and settings.BASE_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
-                rates = parse_rates_to_base_currency(rates, settings.OPENEXCHANGE_BASE_CURRENCY)
+                rates = parse_rates_to_base_currency(rates, settings.BASE_CURRENCY)
         except Exception:
             raise RateBackendError('Error retrieving data from {}'.format(self.url))
 

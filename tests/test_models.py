@@ -33,7 +33,7 @@ class TestRate(TestCase):
 
     def setUp(self):
         rs = RateSource.objects.create(name='Test source')
-        self.c1 = Rate.objects.create(source=rs, currency='EUR', value=Decimal('1.1176'))
+        self.c1 = Rate.objects.create(source=rs, currency='GBP', value=Decimal('1.1176'))
         self.c2 = Rate.objects.create(source=rs, currency='MXN', value=Decimal('0.054069'))
 
     def test_get_ratio(self):
