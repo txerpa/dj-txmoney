@@ -286,7 +286,7 @@ class TestMoney(object):
 
         # Mismatched currencies
         (Money('0', 'EUR') == Money('0', 'JPY'), False),
-        (Money('100', 'EUR') == Money('100'), False),
+        (Money('100', 'JPY') == Money('100'), False),
         (Money('100', 'EUR') == Money('100', 'JPY'), False),
         (Money('100.0', 'EUR') == Money('100', 'JPY'), False),
 
@@ -305,7 +305,7 @@ class TestMoney(object):
 
         # Mismatched currencies
         (Money('0', 'EUR') != Money('0', 'JPY'), True),
-        (Money('100', 'EUR') != Money('100'), True),
+        (Money('100', 'JPY') != Money('100'), True),
         (Money('100', 'EUR') != Money('100', 'JPY'), True),
         (Money('100.0', 'EUR') != Money('100', 'JPY'), True),
 
@@ -393,10 +393,10 @@ class TestMoney(object):
         assert value == expected
 
     def test_string_parse(self):
-        value = Money.from_string('100.0 EUR')
+        value = Money.from_string('100.0 GBP')
         assert value.amount == Decimal('100.0')
-        assert value.currency == 'EUR'
-        assert value.currency == CURRENCIES['EUR']
+        assert value.currency == 'GBP'
+        assert value.currency == CURRENCIES['GBP']
 
     def test_string_parse_default_currency(self):
         value = Money.from_string('100.35')

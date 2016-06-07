@@ -26,7 +26,7 @@ try:
         MIDDLEWARE_CLASSES=(),
         TXMONEY={
             'BACKEND_KEY': 'bd1c4da0260242ad8807b2a8f0720750',  # TODO: anadir a variable de entorno
-            'BASE_CURRENCY': 'USD',
+            'BASE_CURRENCY': 'EUR',
         },
     )
 
