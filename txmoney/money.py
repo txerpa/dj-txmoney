@@ -9,10 +9,10 @@ from six import python_2_unicode_compatible, string_types
 from django.utils.translation import ugettext_lazy as _
 
 from .exceptions import (
-    CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError,
-    InvalidMoneyOperation
+    CurrencyDoesNotExist, CurrencyMismatch,
+    IncorrectMoneyInputError, InvalidMoneyOperation
 )
-from .models import Rate
+from .rates.models import Rate
 from .settings import txmoney_settings as settings
 
 CURRENCIES = {}

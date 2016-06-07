@@ -1,5 +1,5 @@
 # coding=utf-8
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from decimal import Decimal
 
@@ -8,14 +8,11 @@ from six import string_types
 from django.db import models
 from django.db.models import QuerySet
 
-from .exceptions import NotSupportedLookup
-from .money import Money
-from .settings import txmoney_settings as settings
-from .forms import MoneyField as FormMoneyField
-
-
-def currency_field_name(name):
-    return '{}_currency'.format(name)
+from ..exceptions import NotSupportedLookup
+from ..forms import MoneyField as FormMoneyField
+from ..money import Money
+from ..settings import txmoney_settings as settings
+from ..utils import currency_field_name
 
 
 def currency_field_db_column(db_column):
