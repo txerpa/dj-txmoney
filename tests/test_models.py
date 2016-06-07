@@ -7,7 +7,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from txmoney.exceptions import RateDoesNotExist
-from txmoney.models import Rate, RateSource
+from txmoney.rates.models import Rate, RateSource
 from txmoney.settings import txmoney_settings as settings
 
 try:

@@ -5,9 +5,7 @@ from decimal import Decimal
 
 from six import iteritems
 
-from django.db.models.expressions import BaseExpression, F
-
-from .money import CURRENCIES, Money
+from .money import CURRENCIES
 from .settings import txmoney_settings as settings
 
 
@@ -41,26 +39,5 @@ def clean_rates(rates):
     return rates
 
 
-def get_currency_field_name(name):
-    return "%s_currency" % name
-
-
-def get_amount(value):
-    """
-    Extracts decimal value from Money or Expression.
-    """
-    if isinstance(value, Money):
-        return value.amount
-    elif isinstance(value, BaseExpression) and not isinstance(value, F):
-        return get_amount(value.value)
-    return value
-
-
-def prepare_expression(expr):
-    """
-    Prepares some complex money expression to be used in query.
-    """
-    lhs, rhs = expr.lhs, expr.rhs
-    amount = get_amount(rhs)
-    expr.rhs.value = amount
-    return lhs
+def currency_field_name(name):
+    return '{}_currency'.format(name)

@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+from os.path import join, dirname
 
 try:
     from setuptools import setup
@@ -47,7 +48,7 @@ setup(
         'txmoney',
     ],
     include_package_data=True,
-    install_requires=[],
+    install_requires=open(join(dirname(__file__), 'requirements.txt')).readlines(),
     license='BSD',
     zip_safe=False,
     keywords=keywords,

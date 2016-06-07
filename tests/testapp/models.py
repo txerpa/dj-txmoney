@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from six import python_2_unicode_compatible
 
-from txmoney.fields import MoneyField
+from txmoney.models.fields import MoneyField
 from txmoney.money import Money
 from txmoney.settings import txmoney_settings as settings
 
