@@ -299,7 +299,7 @@ def test_instance_save(cls):
 @pytest.mark.django_db
 @pytest.mark.parametrize('cls', ALL_PARAMETRIZED_MODELS)
 def test_manager_create_override_with_money(cls):
-    overridden_value = Money('9876', 'EUR')
+    overridden_value = Money('9876', 'GBP')
     instance = cls.objects.create(value=overridden_value)
     assert instance.value != instance.expected_value()
     assert instance.value.amount != instance.expected_value().amount
@@ -312,7 +312,7 @@ def test_manager_create_override_with_money(cls):
 
 @pytest.mark.parametrize('cls', ALL_PARAMETRIZED_MODELS)
 def test_instance_create_override_with_money(cls):
-    overridden_value = Money('8765', 'EUR')
+    overridden_value = Money('8765', 'GBP')
     instance = cls(value=overridden_value)
     assert instance.value != instance.expected_value()
     assert instance.value.amount != instance.expected_value().amount
