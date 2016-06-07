@@ -1,6 +1,10 @@
+# coding=utf-8
+from __future__ import absolute_import, unicode_literals
+
 from django import forms
 
-from txmoney.money import Money, CURRENCIES
+from ..money import CURRENCIES, Money
+from .widgets import CurrencySelectWidget
 
 
 class MoneyField(forms.MultiValueField):
@@ -29,22 +33,3 @@ class MoneyField(forms.MultiValueField):
         if data_list:
             return Money(*data_list)
         return None
-
-
-class CurrencySelectWidget(forms.MultiWidget):
-    """
-    Custom widget for entering a value and choosing a currency
-    """
-
-    def __init__(self, choices=None, attrs=None):
-        widgets = (
-            forms.TextInput(attrs=attrs),
-            forms.Select(attrs=attrs, choices=choices),
-        )
-        super(CurrencySelectWidget, self).__init__(widgets, attrs)
-
-    def decompress(self, value):
-        try:
-            return [value.amount, value.currency]
-        except:
-            return [None, None]

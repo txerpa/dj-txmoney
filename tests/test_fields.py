@@ -9,7 +9,10 @@ from txmoney.exceptions import NotSupportedLookup
 from txmoney.money import CURRENCIES, Money
 from txmoney.settings import txmoney_settings as settings
 
-from .testapp.models import ALL_PARAMETRIZED_MODELS, MoneyModelDefaults, NullableMoneyModel, SimpleMoneyModel
+from .testapp.models import (
+    ALL_PARAMETRIZED_MODELS, MoneyModelDefaults,
+    NullableMoneyModel, SimpleMoneyModel
+)
 
 
 def assertsamecurrency(moneys, currency_code=None):
