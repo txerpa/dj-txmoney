@@ -7,8 +7,8 @@ from decimal import Decimal
 from django.db import models
 from django.utils.functional import cached_property
 
-from ..exceptions import RateDoesNotExist
 from ..settings import txmoney_settings as settings
+from .exceptions import RateDoesNotExist
 
 
 class RateSource(models.Model):

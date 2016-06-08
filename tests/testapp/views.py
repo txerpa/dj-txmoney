@@ -3,7 +3,7 @@ from __future__ import print_function
 from django.shortcuts import render_to_response
 
 from tests.testapp.models import SimpleMoneyModel
-from txmoney.money import Money
+from txmoney.money.money import Money
 from txmoney.settings import txmoney_settings as settings
 
 
