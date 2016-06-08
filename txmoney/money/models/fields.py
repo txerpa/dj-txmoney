@@ -133,8 +133,8 @@ class MoneyField(InfiniteDecimalField):
     def to_python(self, value):
         if isinstance(value, string_types):
             try:
-                (currency, value) = value.split()
-                if currency and value:
+                (value, currency) = value.split()
+                if value and currency:
                     return Money(value, currency)
             except ValueError:
                 pass
