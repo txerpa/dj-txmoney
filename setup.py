@@ -36,8 +36,8 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 keywords = 'dj-txmoney txmoney money currency finance'.split()
 
 install_requires = [
-    "Django>=1.8.1,<1.10",
-    "six"
+    'Django>=1.8.1,<1.10',
+    'six'
 ]
 
 # Testing dependencies
@@ -46,7 +46,8 @@ testing_extras = [
     'mock',
     'tox',
     'pytest',
-    'pytest-django'
+    'pytest-django',
+    'pytest-sugar',
 
     # For coverage and PEP8 linting
     'coverage>=4.1',
