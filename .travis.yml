@@ -1,19 +1,45 @@
 # Config file for automatic testing at travis-ci.org
 language: python
+cache: pip
 
-python:
-  - "3.5"
-  - "2.7"
+# Use container-based infrastructure
+sudo: false
 
-before_install:
-  - pip install codecov
+matrix:
+  include:
+   - env: TOXENV=py27-dj18-sqlite
+     python: 2.7
+   - env: TOXENV=py27-dj18-postgres
+     python: 2.7
+   - env: TOXENV=py35-dj18-sqlite
+     python: 3.5
+   - env: TOXENV=py35-dj18-postgres
+     python: 3.5
+   - env: TOXENV=py27-dj19-sqlite
+     python: 2.7
+   - env: TOXENV=py27-dj19-postgres
+     python: 2.7
+   - env: TOXENV=py35-dj19-sqlite
+     python: 3.5
+   - env: TOXENV=py35-dj19-postgres
+     python: 3.5
 
-install: pip install -r requirements_test.txt
+# Package installation
+install: pip install tox codecov
 
-services:
-  - postgresql
+# Pre-test configuration
+before_script:
+  - psql -c 'create database txmoney;' -U postgres
 
-script: python runtests.py
+# Run the tests
+script: tox
 
-after_success:
-  - codecov
+after_success: codecov
+
+# Who to notify about build results
+notifications:
+  email:
+    recipients:
+      - mateu.canaves@txerpa.com
+    on_success: change
+    on_failure: always
