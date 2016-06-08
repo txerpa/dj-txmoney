@@ -9,7 +9,6 @@ from django.db import models
 from django.db.models import QuerySet
 
 from ..exceptions import NotSupportedLookup
-from ..forms import MoneyField as FormMoneyField
 from ..money import Money
 from ..settings import txmoney_settings as settings
 from ..utils import currency_field_name
@@ -199,11 +198,6 @@ class MoneyField(InfiniteDecimalField):
         """
         value = self._get_val_from_obj(obj)
         return value.amount
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': FormMoneyField}
-        defaults.update(kwargs)
-        return super(MoneyField, self).formfield(**defaults)
 
 
 class QuerysetWithMoney(QuerySet):

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding=utf-8
 import os
 import re
 import sys
 from os.path import join, dirname
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
@@ -33,8 +33,36 @@ if sys.argv[-1] == 'publish':
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
-
 keywords = 'dj-txmoney txmoney money currency finance'.split()
+
+install_requires = [
+    'Django>=1.8.1,<1.10',
+    'six'
+]
+
+# Testing dependencies
+testing_extras = [
+    # Required for running the tests
+    'mock',
+    'tox',
+    'pytest',
+    'pytest-django',
+    'pytest-sugar',
+
+    # For coverage and PEP8 linting
+    'coverage>=4.1',
+    'pytest-cov',
+    'flake8>=2.2.0',
+]
+
+# Documentation dependencies
+documentation_extras = [
+    'Sphinx>=1.3.1',
+    'sphinx-autobuild>=0.5.2',
+    'sphinx_rtd_theme>=0.1.8',
+    'sphinxcontrib-spelling==2.1.1',
+    'pyenchant==1.6.6',
+]
 
 setup(
     name='dj-txmoney',
@@ -44,11 +72,13 @@ setup(
     author='Mateu Cànaves Albertí',
     author_email='mateu.canaves@gmail.com',
     url='https://github.com/txerpa/dj-txmoney',
-    packages=[
-        'txmoney',
-    ],
+    packages=find_packages(),
     include_package_data=True,
-    install_requires=open(join(dirname(__file__), 'requirements.txt')).readlines(),
+    install_requires=install_requires,
+    extras_require={
+        'testing': testing_extras,
+        'docs': documentation_extras,
+    },
     license='BSD',
     zip_safe=False,
     keywords=keywords,
