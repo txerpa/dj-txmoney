@@ -31,7 +31,6 @@ INSTALLED_APPS = [
 
     'tests.testapp',
     'txmoney.rates',
-    'txmoney',
 ]
 
 CACHES = {

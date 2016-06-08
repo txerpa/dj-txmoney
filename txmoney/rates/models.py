@@ -17,7 +17,7 @@ class RateSource(models.Model):
     last_update = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
-        index_together = unique_together = ('name', 'base_currency')
+        unique_together = ('name', 'base_currency')
 
     @cached_property
     def is_updated(self):

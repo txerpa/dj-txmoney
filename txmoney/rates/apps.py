@@ -5,5 +5,5 @@ from django.apps import AppConfig
 
 class TxmoneyRatesAppConfig(AppConfig):
     name = 'txmoney.rates'
-    label = 'txmoneyrates'
+    label = 'txmoney'
     verbose_name = "TXMoney rates"
