@@ -37,10 +37,11 @@ keywords = 'dj-txmoney txmoney money currency finance'.split()
 
 install_requires = [
     'Django>=1.8.1,<1.10',
-    'six'
+    'six',
+    'djangorestframework >= 3.1.0',
+    'celery >= 3.0.0',
 ]
 
-# Testing dependencies
 testing_extras = [
     # Required for running the tests
     'mock',
@@ -55,7 +56,6 @@ testing_extras = [
     'flake8>=2.2.0',
 ]
 
-# Documentation dependencies
 documentation_extras = [
     'Sphinx>=1.3.1',
     'sphinx-autobuild>=0.5.2',

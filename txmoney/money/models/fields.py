@@ -3,15 +3,15 @@ from __future__ import absolute_import, unicode_literals
 
 from decimal import Decimal
 
-from six import string_types
-
 from django.db import models
 from django.db.models import QuerySet
 
+from six import string_types
+
+from ...settings import txmoney_settings as settings
+from ...utils import currency_field_name
 from ..exceptions import NotSupportedLookup
 from ..money import Money
-from ..settings import txmoney_settings as settings
-from ..utils import currency_field_name
 
 
 def currency_field_db_column(db_column):
@@ -133,8 +133,8 @@ class MoneyField(InfiniteDecimalField):
     def to_python(self, value):
         if isinstance(value, string_types):
             try:
-                (currency, value) = value.split()
-                if currency and value:
+                (value, currency) = value.split()
+                if value and currency:
                     return Money(value, currency)
             except ValueError:
                 pass
@@ -203,7 +203,7 @@ class MoneyField(InfiniteDecimalField):
 class QuerysetWithMoney(QuerySet):
     def _update_params(self, kwargs):
         from django.db.models.constants import LOOKUP_SEP
-        from txmoney.money import Money
+        from txmoney.money.money import Money
         to_append = {}
         for name, value in kwargs.items():
             if isinstance(value, Money):

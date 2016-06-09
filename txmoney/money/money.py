@@ -4,16 +4,14 @@ from __future__ import absolute_import, division, unicode_literals
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
-from six import python_2_unicode_compatible, string_types
-
 from django.utils.translation import ugettext_lazy as _
 
-from .exceptions import (
-    CurrencyDoesNotExist, CurrencyMismatch,
-    IncorrectMoneyInputError, InvalidMoneyOperation
-)
-from .rates.models import Rate
-from .settings import txmoney_settings as settings
+from six import python_2_unicode_compatible, string_types
+
+from ..rates.models import Rate
+from ..settings import txmoney_settings as settings
+from .exceptions import CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError, InvalidMoneyOperation
+
 
 CURRENCIES = {}
 

@@ -7,25 +7,8 @@ class TXMoneyException(Exception):
     Generic txmoney exception
     """
 
-
-# Rate exceptions
-
-class RateBackendError(TXMoneyException):
-    """
-    Base exceptions raised by RateBackend implementations
-    """
-
-
-class RateDoesNotExist(TXMoneyException):
-    """
-    Invalid Rate
-    """
-    def __init__(self, currency, date):
-        msg = 'No {} rate at {}'.format(currency, date)
-        super(RateDoesNotExist, self).__init__(msg)
-
-
 # Money exceptions
+
 
 class CurrencyDoesNotExist(TXMoneyException):
     """
