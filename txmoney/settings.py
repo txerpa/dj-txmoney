@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-This module is largely inspired by django-rest_framework_txmoney-framework settings.
+This module is largely inspired by django-rest_framework-framework settings.
 
 Settings for txdmoney are all namespaced in the TXDMONEY setting.
 For example your project's `settings.py` file might look like this:

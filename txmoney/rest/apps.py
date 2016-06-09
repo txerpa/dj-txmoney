@@ -5,7 +5,8 @@ from django.apps import AppConfig
 
 
 class RTxmoneyAppConfig(AppConfig):
-    name = 'rest_framework_txmoney'
+    name = 'txmoney.rest'
+    label = 'txmoney_rest_framework'
 
     def ready(self):
         """
@@ -15,12 +16,7 @@ class RTxmoneyAppConfig(AppConfig):
         from rest_framework.serializers import ModelSerializer
         from .fields import MoneyField
 
-        try:
-            # drf 3.0
-            field_mapping = ModelSerializer._field_mapping.mapping
-        except AttributeError:
-            # drf 3.1
-            field_mapping = ModelSerializer.serializer_field_mapping
+        field_mapping = ModelSerializer.serializer_field_mapping
 
         # map TXMoney fields to drf-txmoney MoneyField
         field_mapping.update({
