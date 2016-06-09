@@ -28,16 +28,16 @@ class Migration(migrations.Migration):
                 ('last_update', models.DateTimeField(auto_now=True)),
             ],
         ),
-        migrations.AlterUniqueTogether(
-            name='ratesource',
-            unique_together={('name', 'base_currency')},
-        ),
         migrations.AddField(
             model_name='rate',
             name='source',
             field=models.ForeignKey(related_query_name=b'rate', related_name='rates',
                                     on_delete=django.db.models.deletion.PROTECT,
                                     to='txmoney.RateSource'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='ratesource',
+            unique_together={('name', 'base_currency')},
         ),
         migrations.AlterUniqueTogether(
             name='rate',

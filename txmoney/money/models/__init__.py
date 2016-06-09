@@ -1,1 +1,1 @@
-from .fields import MoneyField  # noqa
+from .fields import MoneyField, CurrencyField  # noqa
