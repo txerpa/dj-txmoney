@@ -5,15 +5,16 @@ import json
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal
 
-from six import iteritems, with_metaclass
-from six.moves.urllib.request import urlopen
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
-from ..exceptions import RateBackendError
+from six import iteritems, with_metaclass
+
+from six.moves.urllib.request import urlopen
+
 from ..settings import txmoney_settings as settings
 from ..utils import parse_rates_to_base_currency
+from .exceptions import TXRateBackendError
 from .models import Rate, RateSource
 
 
@@ -61,7 +62,7 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
                 # Force update last_update date on origin
                 source.save()
         except Exception:
-            raise RateBackendError('Error during {} rates update'.format(self.source_name))
+            raise TXRateBackendError('Error during {} rates update'.format(self.source_name))
 
 
 class OpenExchangeBackend(BaseRateBackend):
@@ -87,6 +88,6 @@ class OpenExchangeBackend(BaseRateBackend):
             if settings.SAME_BASE_CURRENCY and settings.BASE_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
                 rates = parse_rates_to_base_currency(rates, settings.BASE_CURRENCY)
         except Exception:
-            raise RateBackendError('Error retrieving data from {}'.format(self.url))
+            raise TXRateBackendError('Error retrieving data from {}'.format(self.url))
 
         return rates

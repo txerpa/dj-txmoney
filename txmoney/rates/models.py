@@ -7,8 +7,8 @@ from decimal import Decimal
 from django.db import models
 from django.utils.functional import cached_property
 
-from ..exceptions import RateDoesNotExist
 from ..settings import txmoney_settings as settings
+from .exceptions import RateDoesNotExist
 
 
 class RateSource(models.Model):
@@ -17,7 +17,7 @@ class RateSource(models.Model):
     last_update = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
-        index_together = unique_together = ('name', 'base_currency')
+        unique_together = ('name', 'base_currency')
 
     @cached_property
     def is_updated(self):

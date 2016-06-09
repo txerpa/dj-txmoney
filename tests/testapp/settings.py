@@ -29,9 +29,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sites',
 
+    'rest_framework',
+
     'tests.testapp',
     'txmoney.rates',
-    'txmoney',
+    'txmoney.rest',
 ]
 
 CACHES = {

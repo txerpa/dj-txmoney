@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from six import iteritems
 
-from .money import CURRENCIES
+from .money.money import CURRENCIES
 from .settings import txmoney_settings as settings
 
 

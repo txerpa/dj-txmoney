@@ -6,9 +6,10 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from txmoney.exceptions import RateDoesNotExist
+from txmoney.rates.exceptions import RateDoesNotExist
 from txmoney.rates.models import Rate, RateSource
 from txmoney.settings import txmoney_settings as settings
+
 
 try:
     from mock import patch

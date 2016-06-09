@@ -1,18 +1,15 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals
 
-import pytest
-
 from django.db import IntegrityError
 
-from txmoney.exceptions import NotSupportedLookup
-from txmoney.money import CURRENCIES, Money
+import pytest
+
+from txmoney.money.exceptions import NotSupportedLookup
+from txmoney.money.money import CURRENCIES, Money
 from txmoney.settings import txmoney_settings as settings
 
-from .testapp.models import (
-    ALL_PARAMETRIZED_MODELS, MoneyModelDefaults,
-    NullableMoneyModel, SimpleMoneyModel
-)
+from .testapp.models import ALL_PARAMETRIZED_MODELS, MoneyModelDefaults, NullableMoneyModel, SimpleMoneyModel
 
 
 def assertsamecurrency(moneys, currency_code=None):

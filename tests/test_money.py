@@ -1,14 +1,12 @@
 # coding=utf-8
-from __future__ import division, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from decimal import Decimal
 
 import pytest
 
-from txmoney.exceptions import (
-    CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError
-)
-from txmoney.money import CURRENCIES, Currency, Money
+from txmoney.money.exceptions import CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError
+from txmoney.money.money import CURRENCIES, Currency, Money
 from txmoney.settings import txmoney_settings as settings
 
 
