@@ -31,6 +31,8 @@ INSTALLED_APPS = [
 
     'tests.testapp',
     'txmoney.rates',
+    'rest_framework',
+    'rest_framework_txmoney',
 ]
 
 CACHES = {
