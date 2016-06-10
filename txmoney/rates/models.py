@@ -17,6 +17,7 @@ class RateSource(models.Model):
     last_update = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
+        app_label = 'txmoneyrates'
         unique_together = ('name', 'base_currency')
 
     @cached_property
@@ -55,6 +56,7 @@ class Rate(models.Model):
     objects = RateQuerySet.as_manager()
 
     class Meta:
+        app_label = 'txmoneyrates'
         unique_together = ('source', 'currency', 'date')
 
     @staticmethod
