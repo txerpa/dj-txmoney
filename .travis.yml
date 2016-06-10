@@ -1,45 +1,30 @@
-# Config file for automatic testing at travis-ci.org
 language: python
 cache: pip
-
-# Use container-based infrastructure
 sudo: false
-
 matrix:
   include:
-   - env: TOXENV=py27-dj18-sqlite
-     python: 2.7
-   - env: TOXENV=py27-dj18-postgres
-     python: 2.7
-   - env: TOXENV=py35-dj18-sqlite
-     python: 3.5
-   - env: TOXENV=py35-dj18-postgres
-     python: 3.5
-   - env: TOXENV=py27-dj19-sqlite
-     python: 2.7
-   - env: TOXENV=py27-dj19-postgres
-     python: 2.7
-   - env: TOXENV=py35-dj19-sqlite
-     python: 3.5
-   - env: TOXENV=py35-dj19-postgres
-     python: 3.5
-
-# Package installation
+  - env: TOXENV=py27-dj18-sqlite
+    python: 2.7
+  - env: TOXENV=py27-dj18-postgres
+    python: 2.7
+  - env: TOXENV=py35-dj18-sqlite
+    python: 3.5
+  - env: TOXENV=py35-dj18-postgres
+    python: 3.5
+  - env: TOXENV=py27-dj19-sqlite
+    python: 2.7
+  - env: TOXENV=py27-dj19-postgres
+    python: 2.7
+  - env: TOXENV=py35-dj19-sqlite
+    python: 3.5
+  - env: TOXENV=py35-dj19-postgres
+    python: 3.5
 install: pip install tox codecov
-
-# Pre-test configuration
 before_script:
-  - psql -c 'create database txmoney;' -U postgres
-
-# Run the tests
+- psql -c 'create database txmoney;' -U postgres
 script: tox
-
 after_success: codecov
-
-# Who to notify about build results
 notifications:
-  email:
-    recipients:
-      - mateu.canaves@txerpa.com
-    on_success: change
-    on_failure: always
+  hipchat:
+    rooms:
+      secure: ttr3e+qIh8Fs9ShuxCddHyS6svIpaYRIFoJz5ivRAovxdmni6cJU/+KG8TaoTROkEMejkPAKIx/3s6wuiL7nz3ITVX6td3w+gGhxj6CmTvT7NOEkwgfje2PZAobwR3OtbORc4KEaMnPgwkkU180g60uMsrANxcsYieynCxU6ST1XaKkNdR5lq/bGmAv+BVxQyXQUc5HNxJ5zMLHypclY39bYotXeTuda/JNaI8OYYcU6qlFTOEd7GDyIe3OBkdAJ3N9XNe0y5KhxIkXC1PtqCulOdc8L59S0zUg10f/ghJKYSrDOK6EStu3nHGOds2ENrX8xFxKcdmKMkxEeNxZDxBNom28k+Ljlt3tNQ5qXQW6LrlvCMm42jUu1U5TEnC+UcsnOptIhY01sFZZw4Y+m8VSVbG+LpHNqlmRJhGBOnL0rKC5IRg6e7+KP/pLkaiF+F2/gP1ES7bqRhOh1ikH5bDthTk/s/9pmNF+MLld0Tq3ESCSzOVOermZMmZxGofrgs+J0NJcLe6ItHZzKCXa4NG7ZfAg350XxWKjOMgt6HE3PUp95Y0vT/WTr8MU1YqyV/VgrLnfcdY6mHcKMM4ma5ClkdZevXQaWCRymPX+kmWcW3PoPV91zcolBiOeXfzehRLpEAOJXSLKK2u73sOHHpDoGcZp53ZFMUuRxQ97h7ow=
