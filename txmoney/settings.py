@@ -27,8 +27,8 @@ USER_SETTINGS = getattr(settings, str('TXMONEY'), None)
 
 DEFAULTS = {
     'DEFAULT_BACKEND': 'txmoney.rates.backends.OpenExchangeBackend',
-    'BACKEND_KEY': '',
     'BASE_CURRENCY': 'USD',
+    'BACKEND_KEY': '',
     'SAME_BASE_CURRENCY': True,
 
     'OPENEXCHANGE_NAME': 'openexchangerates.org',

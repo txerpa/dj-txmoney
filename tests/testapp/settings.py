@@ -52,6 +52,6 @@ PASSWORD_HASHERS = (
 SITE_ID = 1
 
 TXMONEY = {
-    'BACKEND_KEY': os.environ.get('BACKEND_KEY', 'bd1c4da0260242ad8807b2a8f0720750'),  # TODO: anadir a variable de entorno
+    'BACKEND_KEY': os.environ.get('BACKEND_KEY'),
     'BASE_CURRENCY': 'EUR',
 }

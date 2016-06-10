@@ -4,9 +4,10 @@ from __future__ import absolute_import, unicode_literals
 from django.apps import AppConfig
 
 
-class RTxmoneyAppConfig(AppConfig):
+class TXMoneyRestAppConfig(AppConfig):
     name = 'txmoney.rest'
-    label = 'txmoney_rest_framework'
+    label = 'txmoneyrest'
+    verbose_name = "TXMoney drf support"
 
     def ready(self):
         """

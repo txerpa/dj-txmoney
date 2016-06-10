@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding=utf-8
+from __future__ import absolute_import, unicode_literals
+
 import os
 import re
-import sys
-from os.path import join, dirname
+
 
 try:
     from setuptools import setup, find_packages
@@ -21,16 +22,6 @@ def get_version(*file_paths):
 
 version = get_version('txmoney', '__init__.py')
 
-if sys.argv[-1] == 'publish':
-    try:
-        import wheel
-    except ImportError:
-        print('Wheel library missing. Please run "pip install wheel"')
-        sys.exit()
-    os.system('python setup.py sdist upload')
-    os.system('python setup.py bdist_wheel upload')
-    sys.exit()
-
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 keywords = 'dj-txmoney txmoney money currency finance'.split()
@@ -38,8 +29,6 @@ keywords = 'dj-txmoney txmoney money currency finance'.split()
 install_requires = [
     'Django>=1.8.1,<1.10',
     'six',
-    'djangorestframework >= 3.1.0',
-    'celery >= 3.0.0',
 ]
 
 testing_extras = [
@@ -52,7 +41,6 @@ testing_extras = [
 
     # For coverage and PEP8 linting
     'coverage>=4.1',
-    'pytest-cov',
     'flake8>=2.2.0',
 ]
 
@@ -76,6 +64,9 @@ setup(
     include_package_data=True,
     install_requires=install_requires,
     extras_require={
+        'postgresql': ['psycopg2>=2.6'],
+        'rates': ['celery>=3.0.0'],
+        'rest': ['djangorestframework>=3.1.0'],
         'testing': testing_extras,
         'docs': documentation_extras,
     },
