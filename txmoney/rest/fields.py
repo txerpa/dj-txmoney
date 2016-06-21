@@ -1,10 +1,12 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals
 
+from django.utils.translation import ugettext_lazy as _
+
 from rest_framework.fields import Field
-from six import string_types
 
 from txmoney.money import Money
+from txmoney.money.exceptions import IncorrectMoneyInputError
 
 
 class MoneyField(Field):
@@ -12,6 +14,12 @@ class MoneyField(Field):
     A field to handle TXMoney money fields
     """
     type_name = 'MoneyField'
+    default_error_messages = {
+        'invalid': _('A valid money is required.'),
+        'max_digits': _('Ensure that there are no more than {max_digits} digits in total.'),
+        'max_decimal_places': _('Ensure that there are no more than {max_decimal_places} decimal places.'),
+        'max_whole_digits': _('Ensure that there are no more than {max_whole_digits} digits before the decimal point.'),
+    }
 
     def __init__(self, max_digits, decimal_places, rounded=False, **kwargs):
         self.max_digits = max_digits
@@ -26,15 +34,14 @@ class MoneyField(Field):
         super(MoneyField, self).__init__(**kwargs)
 
     def to_internal_value(self, value):
-        if isinstance(value, string_types):
-            try:
-                (value, currency) = value.split()
-                if value and currency:
-                    value = Money(value, currency)
-            except ValueError:
-                self.fail('invalid')
-        else:
+        """
+        Validate that the input is a Money accepted number and return a Money
+        instance.
+        """
+        try:
             value = Money(value)
+        except IncorrectMoneyInputError:
+            self.fail('invalid')
 
         return self.validate_precision(value)
 
