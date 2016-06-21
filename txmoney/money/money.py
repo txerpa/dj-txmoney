@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, unicode_literals
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from six import python_2_unicode_compatible, string_types
@@ -86,9 +87,10 @@ class Money(object):
     The following are supported:
         Money()                 # 0 XXX
         Money(123)              # 123 XXX
+        Money(123.00)           # 123.00 XXX
         Money('123.00')         # 123.00 XXX
         Money('123', 'EUR')     # 123 EUR
-        Money('123.00', 'EUR')  # USD 123.00
+        Money('123.00', 'EUR')  # 123.00 EUR
 
         # Parsed string
         Money('123.00 EUR')     # 123.00 EUR
@@ -103,26 +105,27 @@ class Money(object):
         Money(Decimal('123.0'), Currency(code='AAA', name='My Currency')  # 123.0 AAA
     """
 
-    def __init__(self, amount=None, currency=None):
+    def __init__(self, amount=0, currency=None):
         if isinstance(amount, Decimal):
+            if amount in (Decimal('Inf'), Decimal('-Inf')):
+                raise IncorrectMoneyInputError(
+                    'Cannot initialize with infinity amount'.format(currency, amount)
+                )
             self._amount = amount
         else:
             try:
-                self._amount = Decimal(amount or 0)
+                self._amount = Decimal(smart_text(amount).strip())
             except InvalidOperation:
-                # Decimal couldn't initialize it..
                 try:
                     # check for the odd case of Money("123.00 EUR", "USD")
                     if currency:
                         raise IncorrectMoneyInputError(
-                            'Initialized with conflicting currencies {} {}'.format(currency.code, self._amount)
+                            'Initialized with conflicting currencies {} {}'.format(currency, amount)
                         )
 
                     self._amount, currency = self._from_string(amount)
                 except:
                     raise IncorrectMoneyInputError('Cannot initialize with amount {}'.format(amount))
-
-                    # at this point we have amount and possibly a currency
 
         if not currency:
             currency = settings.BASE_CURRENCY
