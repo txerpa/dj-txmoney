@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from datetime import date
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
@@ -152,7 +152,7 @@ class Money(object):
         :return:
         """
         decimals = Decimal(10) ** -self._currency.decimals
-        return self._amount.quantize(decimals)
+        return self._amount.quantize(decimals, rounding=ROUND_HALF_UP)
 
     @property
     def currency(self):
@@ -291,6 +291,11 @@ class Money(object):
 
     def __ge__(self, other):
         return self > other or self == other
+
+    def round(self, n=None):
+        n = n or self._currency.decimals
+        decimals = Decimal(10) ** -n
+        return self.__class__(self._amount.quantize(decimals, rounding=ROUND_HALF_UP), self._currency)
 
     def allocate(self, ratios):
         """
