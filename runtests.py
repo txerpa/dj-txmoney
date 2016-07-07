@@ -5,8 +5,6 @@ import argparse
 import os
 import sys
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.testapp.settings'
-
 
 def make_parser():
     parser = argparse.ArgumentParser()

@@ -128,7 +128,7 @@ class TestMoney(object):
     MONEY_PRECISION = [
         (Money('10 EUR'), Decimal(10)),
         (Money('10.2 EUR'), Decimal('10.2')),
-        (Money('10.225 EUR'), Decimal('10.22')),
+        (Money('10.225 EUR'), Decimal('10.23')),
         (Money('10.226 EUR'), Decimal('10.23')),
         (Money('10.2288 EUR'), Decimal('10.23'))
     ]
@@ -403,3 +403,16 @@ class TestMoney(object):
         assert value.amount == Decimal('100.35')
         assert value.currency == settings.BASE_CURRENCY
         assert value.currency == CURRENCIES[settings.BASE_CURRENCY]
+
+    MONEY_ROUND = [
+        (lambda: Money('123.001', 'EUR').round(), Money('123', 'EUR')),
+        (lambda: Money('123.005', 'EUR').round(), Money('123.01', 'EUR')),
+        (lambda: Money('123.006', 'EUR').round(), Money('123.01', 'EUR')),
+        (lambda: Money('123.001', 'EUR').round(3), Money('123.001', 'EUR')),
+        (lambda: Money('123.005', 'EUR').round(3), Money('123.005', 'EUR')),
+        (lambda: Money('123.006', 'EUR').round(3), Money('123.006', 'EUR')),
+    ]
+
+    @pytest.mark.parametrize('value,expected', MONEY_ROUND)
+    def test_round(self, value, expected):
+        assert value() == expected
