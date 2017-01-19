@@ -46,7 +46,7 @@ setup(
         'rates': ['celery>=3.0.0 < 4.0'],
         'rest': ['djangorestframework>=3.1.0'],
     },
-    license='BSD',
+    license='MIT',
     zip_safe=False,
     keywords=keywords,
     classifiers=[
