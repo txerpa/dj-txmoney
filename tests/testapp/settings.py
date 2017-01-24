@@ -7,7 +7,7 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.environ.get('DATABASE_NAME', 'txmoney'),
+        'NAME': os.environ.get('DATABASE_NAME', ':memory:'),
         'USER': os.environ.get('DATABASE_USER', 'postgres'),
         'PASSWORD': os.environ.get('DATABASE_PASS', 'postgres'),
         'HOST': os.environ.get('DATABASE_HOST', 'localhost'),

@@ -47,7 +47,7 @@ class Rate(models.Model):
     source = models.ForeignKey(RateSource, on_delete=models.PROTECT, related_name='rates', related_query_name='rate')
     currency = models.CharField(max_length=3)
     value = models.DecimalField(max_digits=14, decimal_places=6)
-    date = models.DateField(auto_now_add=True, blank=True)
+    date = models.DateField(auto_now_add=True, blank=True, db_index=True)
 
     objects = RateQuerySet.as_manager()
 
