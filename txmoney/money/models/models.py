@@ -2,17 +2,18 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from datetime import date
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
-
 from six import python_2_unicode_compatible, string_types
 
-from ..rates.models import Rate
-from ..settings import txmoney_settings as settings
-from .exceptions import CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError, InvalidMoneyOperation
-
+from txmoney.money.exceptions import (
+    CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError,
+    InvalidMoneyOperation
+)
+from txmoney.rates.models import Rate
+from txmoney.settings import txmoney_settings as settings
 
 CURRENCIES = {}
 

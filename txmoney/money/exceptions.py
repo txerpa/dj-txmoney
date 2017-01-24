@@ -20,20 +20,25 @@ class CurrencyDoesNotExist(TXMoneyException):
 
 
 class IncorrectMoneyInputError(TXMoneyException):
-    """Invalid input for the Money object"""
+    """
+    Invalid input for the Money object
+    """
 
 
 class CurrencyMismatch(TXMoneyException, ArithmeticError):
-    """ Raised when an operation is not allowed between differing currencies """
+    """
+    Raised when an operation is not allowed between differing currencies
+    """
 
 
 class InvalidMoneyOperation(TXMoneyException, TypeError):
-    """ Raised when an operation is never allowed """
+    """
+    Raised when an operation is never allowed
+    """
 
+# Field exceptions
 
-# Money field exceptions
 
 class NotSupportedLookup(TXMoneyException):
     def __init__(self, lookup):
-        msg = 'Lookup {} is not supported for MoneyField'.format(lookup)
-        super(NotSupportedLookup, self).__init__(msg)
+        super(NotSupportedLookup, self).__init__("Lookup '%s' is not supported for MoneyField" % lookup)

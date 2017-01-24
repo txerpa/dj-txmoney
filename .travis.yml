@@ -1,30 +1,26 @@
-language: python
-cache: pip
+# Config file for automatic testing at travis-ci.org
 sudo: false
+language: python
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
+install: pip install -q tox-travis
+env:
+  - DJANGO=1.8
+  - DJANGO=1.9
+  - DJANGO=1.10
+  - DB=sqlite
+  - DB=postgres
 matrix:
+  fast_finish: true
   include:
-  - env: TOXENV=py27-dj18-sqlite
-    python: 2.7
-  - env: TOXENV=py27-dj18-postgres
-    python: 2.7
-  - env: TOXENV=py35-dj18-sqlite
-    python: 3.5
-  - env: TOXENV=py35-dj18-postgres
-    python: 3.5
-  - env: TOXENV=py27-dj19-sqlite
-    python: 2.7
-  - env: TOXENV=py27-dj19-postgres
-    python: 2.7
-  - env: TOXENV=py35-dj19-sqlite
-    python: 3.5
-  - env: TOXENV=py35-dj19-postgres
-    python: 3.5
-install: pip install tox codecov
-before_script:
-- psql -c 'create database txmoney;' -U postgres
+    - python: "2.7"
+      env: TOXENV="lint"
 script: tox
-after_success: codecov
+after_success:
+  - pip install -q codecov scrutinizer-ocular
+  - codecov -e TOXENV,DJANGO
+  - ocular --data-file ".coverage" --config-file ".coveragerc"
 notifications:
-  hipchat:
-    rooms:
-      secure: DToqspcaW7jtcAoLutoIRvryxlmn5mw3LyEF/nZNb7TbJvIAcehwUBop3FFuJkzx5uF8G13eGewawpZ4+DlK4OItJqdImcGvUiINUUdUSvUPX1CjsXTocnojaBxHdjQ4CLCK1Uc3TmnyzkBbr8n0nO2l/wn1t68QhNJv0N1KWbghXk4I1vEbYDteJNHy1HwVFRj1TecBP5fVq2pkDVEUSWj/dv8DaOeUiMOhMVYsLzX0qg0DCyDRfrKOjs1KABU3T201oWcqJS1YGfTDtzLZLHzFnDRVfwexS8Va8G0pdBDNTawEk2p4RZw2KM6ENjNBmMyQz42nXcdqsxzFi1yyr4KvoBsVchAGN1Nf+8vNXXGQWCc/bilF3uvY2p+42q5biOpb3y0NeFFqICMPoNZ+nqZOK5hsxAsqaWbDJWvdwCJ2S/AM3gVu3kWaJvqrS3vWmfme5qeKbEzaOYPm2FOHqNuDyru0erpj0judq8fSWbfMcQH1xfISi83KhGRrZZV4lXS6VBhWccmCEHz3+m4cej1TAmhhq9IN+JYQ+0ibuD+i9r2uyCodW5I5zfe1plsJrgmIE9Dt8oMIJA+06Bcob43VyqEfM1XZehu8KhNhkbZ5htlGPRKxRsepyDlw6zqJCt6i4ofMh2TdVFJePeQ6ldG9Px/XBJf6lvDatlhGzlE=
+  email: false

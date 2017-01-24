@@ -3,22 +3,80 @@ from __future__ import absolute_import, unicode_literals
 
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Field
+from django.db.models.expressions import (
+    BaseExpression, Expression, F, Func, Value
+)
+from django.utils.six import string_types
 
-from six import string_types
+from txmoney.compat import smart_unicode
+from txmoney.money.exceptions import NotSupportedLookup
+from txmoney.money.models.models import Currency, Money
+from txmoney.money.utils import get_currency_field_name, prepare_expression
+from txmoney.settings import txmoney_settings as settings
 
-from ...settings import txmoney_settings as settings
-from ...utils import currency_field_name
-from ..exceptions import NotSupportedLookup
-from ..money import Money
+__all__ = 'MoneyField'
+
+SUPPORTED_LOOKUPS = ('exact', 'lt', 'gt', 'lte', 'gte', 'isnull', 'in')
 
 
-def currency_field_db_column(db_column):
-    return None if db_column is None else '{}_currency'.format(db_column)
+def get_currency(value):
+    """
+    Extracts currency from value.
+    """
+    if isinstance(value, Money):
+        return smart_unicode(value.currency)
+    elif isinstance(value, (list, tuple)):
+        return value[1]
 
 
-SUPPORTED_LOOKUPS = ('exact', 'lt', 'gt', 'lte', 'gte', 'isnull')
+def get_value(obj, expr):
+    """
+    Extracts value from object or expression.
+    """
+    if isinstance(expr, F):
+        expr = getattr(obj, expr.name)
+    elif hasattr(expr, 'value'):
+        expr = expr.value
+    return expr
+
+
+def validate_money_expression(obj, expr):
+    """
+    Money supports different types of expressions, but you can't do following:
+      - Add or subtract money with not-money
+      - Any exponentiation
+      - Any operations with money in different currencies
+      - Multiplication, division, modulo with money instances on both sides of expression
+    """
+    connector = expr.connector
+    lhs = get_value(obj, expr.lhs)
+    rhs = get_value(obj, expr.rhs)
+
+    if (not isinstance(rhs, Money) and connector in ('+', '-')) or connector == '^':
+        raise ValidationError('Invalid F expression for MoneyField.', code='invalid')
+    if isinstance(lhs, Money) and isinstance(rhs, Money):
+        if connector in ('*', '/', '^', '%%'):
+            raise ValidationError('Invalid F expression for MoneyField.', code='invalid')
+        if lhs.currency != rhs.currency:
+            raise ValidationError('You cannot use F() with different currencies.', code='invalid')
+
+
+def validate_money_value(value):
+    """
+    Valid value for money are:
+      - Single numeric value
+      - Money instances
+      - Pairs of numeric value and currency. Currency can't be None.
+    """
+    if isinstance(value, (list, tuple)) and (len(value) != 2 or value[1] is None):
+        raise ValidationError(
+            'Invalid value for MoneyField: %(value)s.',
+            code='invalid',
+            params={'value': value},
+        )
 
 
 class MoneyFieldProxy(object):
@@ -35,46 +93,55 @@ class MoneyFieldProxy(object):
 
     def __init__(self, field):
         self.field = field
-        self.amount_field_name = field.name
-        self.currency_field_name = currency_field_name(field.name)
+        self.currency_field_name = get_currency_field_name(field.name)
 
-    def _get_values(self, obj):
-        return (
-            obj.__dict__.get(self.field.amount_field_name, None), obj.__dict__.get(self.field.currency_field_name, None)
-        )
-
-    def _set_values(self, obj, amount, currency):
-        obj.__dict__[self.field.amount_field_name] = amount
-        obj.__dict__[self.field.currency_field_name] = currency
+    def _money_from_obj(self, obj):
+        amount_value = obj.__dict__[self.field.name]
+        currency_value = obj.__dict__[self.currency_field_name]
+        if amount_value is None:
+            return None
+        return Money(amount=amount_value, currency=currency_value)
 
     def __get__(self, obj, *args):
-        amount, currency = self._get_values(obj)
-        if amount is None:
-            return None
-        return Money(amount, currency)
+        data = obj.__dict__
+        if isinstance(data[self.field.name], BaseExpression):
+            return data[self.field.name]
+        if not isinstance(data[self.field.name], Money):
+            data[self.field.name] = self._money_from_obj(obj)
+        return data[self.field.name]
 
     def __set__(self, obj, value):
-        if value is None:  # Money(0) is False
-            self._set_values(obj, None, '')
-        elif isinstance(value, Money):
-            self._set_values(obj, value.amount, value.currency)
-        elif isinstance(value, Decimal):
-            _, currency = self._get_values(obj)  # use what is currently set
-            self._set_values(obj, value, currency)
+        if isinstance(value, BaseExpression):
+            if Value and isinstance(value, Value):
+                value = self.prepare_value(obj, value.value)
+            elif Func and isinstance(value, Func):
+                pass
+            else:
+                validate_money_expression(obj, value)
+                prepare_expression(value)
         else:
-            # It could be an int, or some other python native type
-            try:
-                amount = Decimal(str(value))
-                _, currency = self._get_values(obj)  # use what is currently set
-                self._set_values(obj, amount, currency)
-            except TypeError:
-                try:
-                    _, currency = self._get_values(obj)  # use what is currently set
-                    m = Money.from_string(str(value))
-                    self._set_values(obj, m.amount, m.currency)
-                except TypeError:
-                    msg = 'Cannot assign "{}"'.format(type(value))
-                    raise TypeError(msg)
+            value = self.prepare_value(obj, value)
+        obj.__dict__[self.field.name] = value
+
+    def prepare_value(self, obj, value):
+        validate_money_value(value)
+        currency = get_currency(value)
+        if currency:
+            self.set_currency(obj, currency)
+        return self.field.to_python(value)
+
+    def set_currency(self, obj, value):
+        # we have to determine whether to replace the currency.
+        # i.e. if we do the following:
+        # .objects.get_or_create(money_currency='EUR')
+        # then the currency is already set up, before this code hits
+        # __set__ of MoneyField. This is because the currency field
+        # has less creation counter than money field.
+        object_currency = obj.__dict__[self.currency_field_name]
+        if object_currency != value:
+            # in other words, update the currency only if it wasn't
+            # changed before.
+            setattr(obj, self.currency_field_name, value)
 
 
 class CurrencyField(models.CharField):
@@ -84,111 +151,110 @@ class CurrencyField(models.CharField):
     value when serializing to JSON.
     """
 
-    def value_to_string(self, obj):
-        """
-        When serializing, we want to output as two values. This will be just
-        the currency part as stored directly in the database.
-        """
-        value = self._get_val_from_obj(obj)
-        return value
+    def __init__(self, price_field=None, verbose_name=None, name=None, default=settings.BASE_CURRENCY, **kwargs):
+        if isinstance(default, Currency):
+            default = default.code
+        kwargs['max_length'] = 3
+        self.price_field = price_field
+        super(CurrencyField, self).__init__(verbose_name, name, default=default, **kwargs)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        if name not in [f.name for f in cls._meta.fields]:
+            super(CurrencyField, self).contribute_to_class(cls, name)
 
 
-class InfiniteDecimalField(models.DecimalField):
-    def db_type(self, connection):
-        engine = connection.settings_dict['ENGINE']
-
-        if 'postgresql' in engine:
-            return 'numeric'
-
-        return super(InfiniteDecimalField, self).db_type(connection=connection)
-
-    def get_db_prep_save(self, value, *args, **kwargs):
-        # The superclass DecimalField get_db_prep_save will add decimals up to
-        # the precision in the field definition. The point of this class is to
-        # use the user-specified precision up to that limit instead. For that
-        # reason we will call get_db_prep_value instead
-        return self.get_db_prep_value(value, *args, **kwargs)
-
-
-class MoneyField(InfiniteDecimalField):
+class MoneyField(models.DecimalField):
     description = 'A field which stores both the currency and amount of money.'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
         default_currency = kwargs.pop('default_currency', settings.BASE_CURRENCY)
-        default = kwargs.get('default', None)
-        self.blankable = kwargs.get('blank', False)
+        # currency_choices = kwargs.pop('currency_choices', settings.CURRENCY_CHOICES)
+        nullable = kwargs.get('null', False)
+        default = kwargs.pop('default', None)
+        default = self.setup_default(default, default_currency, nullable)
+        if not default_currency:
+            default_currency = default.currency
 
-        if isinstance(default, Money):
-            self.default_currency = default.currency  # use the default's currency
-            kwargs['default'] = default.amount
-        else:
-            self.default_currency = default_currency
+        self.default_currency = default_currency
+        # self.currency_choices = currency_choices
 
-        super(MoneyField, self).__init__(*args, **kwargs)
+        super(MoneyField, self).__init__(verbose_name, name, max_digits, decimal_places, default=default, **kwargs)
+        self.creation_counter += 1
+        Field.creation_counter += 1
 
-    def deconstruct(self):
-        name, path, args, kwargs = super(MoneyField, self).deconstruct()
-        return name, path, args, kwargs
+    def setup_default(self, default, default_currency, nullable):
+        if default is None and not nullable:
+            # Backwards compatible fix for non-nullable fields
+            default = '0.0'
+        if isinstance(default, string_types):
+            try:
+                # handle scenario where default is formatted like:
+                # 'amount currency-code'
+                amount, currency = default.split(' ')
+            except ValueError:
+                # value error would be risen if the default is
+                # without the currency part, i.e
+                # 'amount'
+                amount = default
+                currency = default_currency
+            default = Money(Decimal(amount), Currency(code=currency))
+        elif isinstance(default, (float, Decimal, int)):
+            default = Money(default, default_currency)
+        if not (nullable and default is None) and not isinstance(default, Money):
+            raise ValueError('Default value must be an instance of Money, is: %s' % default)
+        return default
 
     def to_python(self, value):
-        if isinstance(value, string_types):
-            try:
-                (value, currency) = value.split()
-                if value and currency:
-                    return Money(value, currency)
-            except ValueError:
-                pass
-        return value
-
-    def contribute_to_class(self, cls, name):
-        self.name = name
-        self.amount_field_name = name
-        self.currency_field_name = currency_field_name(name)
-
-        if not cls._meta.abstract:
-            c_field = CurrencyField(
-                max_length=3,
-                default=self.default_currency,
-                editable=False,
-                null=False,  # empty char fields should be ''
-                blank=self.blankable,
-                db_column=currency_field_db_column(self.db_column),
-            )
-            # Use this field's creation counter for the currency field. This
-            # field will get a +1 when we call super
-            c_field.creation_counter = self.creation_counter
-            cls.add_to_class(self.currency_field_name, c_field)
-
-        # Set ourselves up normally
-        super(MoneyField, self).contribute_to_class(cls, name)
-
-        # As we are not using SubfieldBase, we need to set our proxy class here
-        setattr(cls, self.name, MoneyFieldProxy(self))
-
-        # Set our custom manager
-        if not hasattr(cls, '_default_manager'):
-            cls.add_to_class('objects', MoneyManager())
-
-    def get_db_prep_save(self, value, *args, **kwargs):
-        if isinstance(value, Money):
-            value = value.amount_rounded
-
-        return super(MoneyField, self).get_db_prep_save(value, *args, **kwargs)
-
-    def get_prep_lookup(self, lookup_type, value):
-        if lookup_type not in SUPPORTED_LOOKUPS:
-            raise NotSupportedLookup(lookup_type)
-
         if isinstance(value, Money):
             value = value.amount
+        if isinstance(value, tuple):
+            value = value[0]
+        if isinstance(value, float):
+            value = str(value)
+        return super(MoneyField, self).to_python(value)
 
-        return super(MoneyField, self).get_prep_lookup(lookup_type, value)
+    def contribute_to_class(self, cls, name, **kwargs):
+        cls._meta.has_money_field = True
+        self.add_currency_field(cls, name)
+        super(MoneyField, self).contribute_to_class(cls, name)
+        setattr(cls, self.name, MoneyFieldProxy(self))
+
+    def add_currency_field(self, cls, name):
+        """
+        Adds CurrencyField instance to a model class.
+        """
+        currency_field = CurrencyField(
+            max_length=3, price_field=self, default=self.default_currency, editable=False,  # choices=self.currency_choices
+        )
+        currency_field.creation_counter = self.creation_counter - 1
+        currency_field_name = get_currency_field_name(name)
+
+        cls.add_to_class(currency_field_name, currency_field)
+
+    def get_db_prep_save(self, value, connection, **kwargs):
+        if isinstance(value, Expression):
+            return value
+        if isinstance(value, Money):
+            value = value.amount
+        return super(MoneyField, self).get_db_prep_save(value, connection)
+
+    def validate_lookup(self, lookup):
+        if lookup not in SUPPORTED_LOOKUPS:
+            raise NotSupportedLookup(lookup)
+
+    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
+        self.validate_lookup(lookup_type)
+        value = self.get_db_prep_save(value, connection)
+        return super(MoneyField, self).get_db_prep_lookup(lookup_type, value, connection, prepared)
+
+    def get_lookup(self, lookup_name):
+        self.validate_lookup(lookup_name)
+        return super(MoneyField, self).get_lookup(lookup_name)
 
     def get_default(self):
         if isinstance(self.default, Money):
             return self.default
-        else:
-            return super(MoneyField, self).get_default()
+        return super(MoneyField, self).get_default()
 
     def value_to_string(self, obj):
         """
@@ -196,83 +262,5 @@ class MoneyField(InfiniteDecimalField):
         Here we only need to output the value. The contributed currency field
         will get called to output itself
         """
-        value = self._get_val_from_obj(obj)
-        return value.amount
-
-
-class QuerysetWithMoney(QuerySet):
-    def _update_params(self, kwargs):
-        from django.db.models.constants import LOOKUP_SEP
-        from txmoney.money.money import Money
-        to_append = {}
-        for name, value in kwargs.items():
-            if isinstance(value, Money):
-                path = name.split(LOOKUP_SEP)
-                if len(path) > 1:
-                    field_name = currency_field_name(path[0])
-                else:
-                    field_name = currency_field_name(name)
-                to_append[field_name] = value.currency
-        kwargs.update(to_append)
-        return kwargs
-
-    def dates(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).dates(*args, **kwargs)
-
-    def distinct(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).distinct(*args, **kwargs)
-
-    def extra(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).extra(*args, **kwargs)
-
-    def get(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).get(*args, **kwargs)
-
-    def get_or_create(self, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).get_or_create(**kwargs)
-
-    def filter(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).filter(*args, **kwargs)
-
-    def complex_filter(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).complex_filter(*args, **kwargs)
-
-    def exclude(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).exclude(*args, **kwargs)
-
-    def in_bulk(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).in_bulk(*args, **kwargs)
-
-    def iterator(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).iterator(*args, **kwargs)
-
-    def latest(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).latest(*args, **kwargs)
-
-    def order_by(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).order_by(*args, **kwargs)
-
-    def select_related(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).select_related(*args, **kwargs)
-
-    def values(self, *args, **kwargs):
-        kwargs = self._update_params(kwargs)
-        return super(QuerysetWithMoney, self).values(*args, **kwargs)
-
-
-class MoneyManager(models.Manager):
-    def get_queryset(self):
-        return QuerysetWithMoney(self.model)
+        value = self.value_from_object(obj)
+        return self.get_prep_value(value)

@@ -5,8 +5,8 @@ from decimal import Decimal
 
 from six import iteritems
 
-from .money.money import CURRENCIES
-from .settings import txmoney_settings as settings
+from txmoney.money.models.models import CURRENCIES
+from txmoney.settings import txmoney_settings as settings
 
 
 def parse_rates_to_base_currency(rates, rates_currency):
@@ -37,7 +37,3 @@ def clean_rates(rates):
             del rates[key]
 
     return rates
-
-
-def currency_field_name(name):
-    return '{}_currency'.format(name)

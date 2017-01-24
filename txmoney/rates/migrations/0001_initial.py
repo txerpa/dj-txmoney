@@ -1,8 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-import django.db.models.deletion
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -32,7 +31,7 @@ class Migration(migrations.Migration):
             model_name='rate',
             name='source',
             field=models.ForeignKey(
-                related_query_name=b'rate', related_name='rates', on_delete=models.PROTECT, to='txmoneyrates.RateSource'
+                related_query_name=b'rate', related_name='rates', on_delete=models.PROTECT, to='txmoney.RateSource'
             ),
         ),
         migrations.AlterUniqueTogether(

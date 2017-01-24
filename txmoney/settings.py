@@ -20,7 +20,6 @@ from __future__ import absolute_import, unicode_literals
 import importlib
 
 import six
-
 from django.conf import settings
 
 USER_SETTINGS = getattr(settings, str('TXMONEY'), None)
@@ -35,6 +34,7 @@ DEFAULTS = {
     'OPENEXCHANGE_URL': 'https://openexchangerates.org/api/latest.json',
     'OPENEXCHANGE_BASE_CURRENCY': 'USD',
 }
+
 
 # List of settings that cannot be empty
 MANDATORY = (
