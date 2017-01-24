@@ -3,12 +3,19 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import BaseExpression, F
 from django.db.models.sql import Query
 from django.db.models.sql.constants import QUERY_TERMS
-from django.utils.encoding import smart_unicode
 from django.utils.six import wraps
 
-from txmoney.money import Money
 from txmoney.money.models.fields import CurrencyField, MoneyField
-from txmoney.money.utils import get_currency_field_name, prepare_expression
+from txmoney.money.models.models import Money
+from txmoney.money.models.utils import (
+    get_currency_field_name, prepare_expression
+)
+
+try:
+    from django.utils.encoding import smart_unicode
+except ImportError:
+    from django.utils.encoding import smart_text as smart_unicode
+
 
 RELEVANT_QUERYSET_METHODS = ('distinct', 'get', 'get_or_create', 'filter', 'exclude')
 EXPAND_EXCLUSIONS = {
@@ -17,7 +24,6 @@ EXPAND_EXCLUSIONS = {
 
 
 def _get_clean_name(name):
-
     # Get rid of __lt, __gt etc for the currency lookup
     path = name.split(LOOKUP_SEP)
     if path[-1] in QUERY_TERMS:

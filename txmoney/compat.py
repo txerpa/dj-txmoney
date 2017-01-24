@@ -3,12 +3,6 @@
 from django import VERSION
 from django.db.models.manager import ManagerDescriptor
 
-try:
-    from django.utils.encoding import smart_unicode
-except ImportError:
-    # Python 3
-    from django.utils.encoding import smart_text as smart_unicode
-
 
 def setup_managers(sender):
     from txmoney.money.models.managers import money_manager

@@ -3,19 +3,29 @@ from __future__ import absolute_import, unicode_literals
 
 from decimal import Decimal
 
+from django import VERSION
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Field
 from django.db.models.expressions import (
     BaseExpression, Expression, F, Func, Value
 )
+from django.db.models.signals import class_prepared
 from django.utils.six import string_types
 
-from txmoney.compat import smart_unicode
+from txmoney.compat import setup_managers
 from txmoney.money.exceptions import NotSupportedLookup
 from txmoney.money.models.models import Currency, Money
-from txmoney.money.utils import get_currency_field_name, prepare_expression
+from txmoney.money.models.utils import (
+    get_currency_field_name, prepare_expression
+)
 from txmoney.settings import txmoney_settings as settings
+
+try:
+    from django.utils.encoding import smart_unicode
+except ImportError:
+    from django.utils.encoding import smart_text as smart_unicode
+
 
 __all__ = 'MoneyField'
 
@@ -41,6 +51,11 @@ def get_value(obj, expr):
     elif hasattr(expr, 'value'):
         expr = expr.value
     return expr
+
+
+def validate_lookup(lookup):
+    if lookup not in SUPPORTED_LOOKUPS:
+        raise NotSupportedLookup(lookup)
 
 
 def validate_money_expression(obj, expr):
@@ -103,6 +118,8 @@ class MoneyFieldProxy(object):
         return Money(amount=amount_value, currency=currency_value)
 
     def __get__(self, obj, *args):
+        if obj is None:
+            raise AttributeError('Can only be accessed via an instance.')
         data = obj.__dict__
         if isinstance(data[self.field.name], BaseExpression):
             return data[self.field.name]
@@ -228,7 +245,6 @@ class MoneyField(models.DecimalField):
         )
         currency_field.creation_counter = self.creation_counter - 1
         currency_field_name = get_currency_field_name(name)
-
         cls.add_to_class(currency_field_name, currency_field)
 
     def get_db_prep_save(self, value, connection, **kwargs):
@@ -238,17 +254,13 @@ class MoneyField(models.DecimalField):
             value = value.amount
         return super(MoneyField, self).get_db_prep_save(value, connection)
 
-    def validate_lookup(self, lookup):
-        if lookup not in SUPPORTED_LOOKUPS:
-            raise NotSupportedLookup(lookup)
-
     def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        self.validate_lookup(lookup_type)
+        validate_lookup(lookup_type)
         value = self.get_db_prep_save(value, connection)
         return super(MoneyField, self).get_db_prep_lookup(lookup_type, value, connection, prepared)
 
     def get_lookup(self, lookup_name):
-        self.validate_lookup(lookup_name)
+        validate_lookup(lookup_name)
         return super(MoneyField, self).get_lookup(lookup_name)
 
     def get_default(self):
@@ -262,5 +274,24 @@ class MoneyField(models.DecimalField):
         Here we only need to output the value. The contributed currency field
         will get called to output itself
         """
-        value = self.value_from_object(obj)
+        if VERSION < (2, 0):
+            value = self._get_val_from_obj(obj)
+        else:
+            value = self.value_from_object(obj)
         return self.get_prep_value(value)
+
+
+def patch_managers(sender, **kwargs):
+    """
+    Patches models managers.
+    """
+    if sender._meta.proxy_for_model:
+        has_money_field = hasattr(sender._meta.proxy_for_model._meta, 'has_money_field')
+    else:
+        has_money_field = hasattr(sender._meta, 'has_money_field')
+
+    if has_money_field:
+        setup_managers(sender)
+
+
+class_prepared.connect(patch_managers)
