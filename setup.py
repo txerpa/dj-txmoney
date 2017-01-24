@@ -41,11 +41,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=install_requires,
-    extras_require={
-        'postgresql': ['psycopg2>=2.6'],
-        'rates': ['celery>=3.0.0 < 4.0'],
-        'rest': ['djangorestframework>=3.1.0'],
-    },
     license='MIT',
     zip_safe=False,
     keywords=keywords,
