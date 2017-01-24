@@ -7,8 +7,8 @@ from decimal import Decimal
 from django.db import models
 from django.utils.functional import cached_property
 
-from ..settings import txmoney_settings as settings
 from .exceptions import RateDoesNotExist
+from ..settings import txmoney_settings as settings
 
 
 class RateSource(models.Model):
@@ -31,20 +31,16 @@ class RateQuerySet(models.QuerySet):
         """
         Get currency for a date
         :param currency: base currency.
-        :param currency_date: ratio currency.
+        :param currency_date: rate currency date.
         :return: Currency
         """
         currency_date = currency_date if currency_date else date.today()
         try:
-            # TODO: check if rate if updated else update
-            return self.get(currency=currency, date=currency_date)
+            backend = settings.DEFAULT_BACKEND()
+            backend.update_rates()  # Only update if backend is not updated
+            return self.filter(currency=currency, date__lte=currency_date).order_by('date')[:1].get()
         except Rate.DoesNotExist:
-            try:
-                backend = settings.DEFAULT_BACKEND()
-                backend.update_rates()
-                return self.get(currency=currency, date=currency_date)
-            except Rate.DoesNotExist:
-                raise RateDoesNotExist(currency, currency_date)
+            raise RateDoesNotExist(currency, currency_date)
 
 
 class Rate(models.Model):

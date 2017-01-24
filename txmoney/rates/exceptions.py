@@ -13,5 +13,5 @@ class RateDoesNotExist(TXRateBackendError):
     Invalid Rate
     """
     def __init__(self, currency, date):
-        msg = 'No {} rate at {}'.format(currency, date)
+        msg = 'No {} rate for {} or older date'.format(currency, date)
         super(RateDoesNotExist, self).__init__(msg)
