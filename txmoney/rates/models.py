@@ -38,7 +38,7 @@ class RateQuerySet(models.QuerySet):
         try:
             backend = settings.DEFAULT_BACKEND()
             backend.update_rates()  # Only update if backend is not updated
-            return self.filter(currency=currency, date__lte=currency_date).order_by('date')[:1].get()
+            return self.filter(currency=currency, date__lte=currency_date).order_by('-date')[:1].get()
         except Rate.DoesNotExist:
             raise RateDoesNotExist(currency, currency_date)
 
