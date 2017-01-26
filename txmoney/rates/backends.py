@@ -7,15 +7,13 @@ from decimal import Decimal
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
-
 from six import iteritems, with_metaclass
-
 from six.moves.urllib.request import urlopen
 
-from ..settings import txmoney_settings as settings
-from ..utils import parse_rates_to_base_currency
 from .exceptions import TXRateBackendError
 from .models import Rate, RateSource
+from ..settings import txmoney_settings as settings
+from ..utils import parse_rates_to_base_currency
 
 
 class BaseRateBackend(with_metaclass(ABCMeta)):
@@ -61,8 +59,8 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
                 Rate.objects.bulk_create(rates)
                 # Force update last_update date on origin
                 source.save()
-        except Exception:
-            raise TXRateBackendError('Error during {} rates update'.format(self.source_name))
+        except Exception as e:
+            raise TXRateBackendError('Error during "%s" rates update. %s' % (self.source_name, e.message))
 
 
 class OpenExchangeBackend(BaseRateBackend):
