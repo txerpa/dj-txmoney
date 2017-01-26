@@ -27,4 +27,4 @@ class Command(BaseCommand):
         except Exception as e:
             raise CommandError('%s' % e.message)
 
-        self.stdout.write(self.style.SUCCESS('Successfully updated rates for "%s"' % backend.source_name))
+        self.stdout.write('Successfully updated rates for "%s"' % backend.source_name)
