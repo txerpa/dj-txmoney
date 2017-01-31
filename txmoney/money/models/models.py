@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from datetime import date
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
