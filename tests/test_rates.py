@@ -10,7 +10,6 @@ from txmoney.rates.exceptions import RateDoesNotExist
 from txmoney.rates.models import Rate, RateSource
 from txmoney.settings import txmoney_settings as settings
 
-
 try:
     from mock import patch
 except NameError:

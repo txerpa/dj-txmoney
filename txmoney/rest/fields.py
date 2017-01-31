@@ -2,11 +2,10 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
-
 from rest_framework.fields import Field
 
-from txmoney.money import Money
 from txmoney.money.exceptions import IncorrectMoneyInputError
+from txmoney.money.models.models import Money
 
 
 class MoneyField(Field):

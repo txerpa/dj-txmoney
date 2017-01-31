@@ -13,7 +13,7 @@ class TXMoneyRestAppConfig(AppConfig):
         """
         update Django Rest Framework serializer mappings
         """
-        from txmoney.money import models
+        from txmoney.money.models import fields
         from rest_framework.serializers import ModelSerializer
         from .fields import MoneyField
 
@@ -21,5 +21,5 @@ class TXMoneyRestAppConfig(AppConfig):
 
         # map TXMoney fields to drf-txmoney MoneyField
         field_mapping.update({
-            models.MoneyField: MoneyField,
+            fields.MoneyField: MoneyField,
         })

@@ -1,1 +1,1 @@
-from .money import Money  # noqa
+# -*- coding: utf-8 -*-

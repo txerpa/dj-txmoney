@@ -1,1 +1,1 @@
-from .fields import MoneyField, CurrencyField  # noqa
+# -*- coding: utf-8 -*-
