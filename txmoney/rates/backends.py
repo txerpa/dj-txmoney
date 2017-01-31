@@ -39,15 +39,11 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
 
     @abstractmethod
     def get_rates_from_source(self):
-        """
-        Return a dictionary that maps currency code with its rate value
-        """
+        """Return a dictionary that maps currency code with its rate value"""
 
     @transaction.atomic
     def update_rates(self):
-        """
-        Creates or updates rates for a source
-        """
+        """ Creates or updates rates for a source"""
         try:
             source, created = RateSource.objects.get_or_create(name=self.source_name, base_currency=self.base_currency)
 
@@ -57,10 +53,9 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
                     rates.append(Rate(source=source, currency=currency, value=value))
 
                 Rate.objects.bulk_create(rates)
-                # Force update last_update date on origin
-                source.save()
-        except Exception:
-            raise TXRateBackendError('Error during {} rates update'.format(self.source_name))
+                source.save()  # Force update last_update date on rate source
+        except Exception as e:
+            raise TXRateBackendError("Error during '%s' rates update. %s" % (self.source_name, e.message))
 
 
 class OpenExchangeBackend(BaseRateBackend):
@@ -85,7 +80,7 @@ class OpenExchangeBackend(BaseRateBackend):
 
             if settings.SAME_BASE_CURRENCY and settings.BASE_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
                 rates = parse_rates_to_base_currency(rates, settings.BASE_CURRENCY)
-        except Exception:
-            raise TXRateBackendError('Error retrieving data from {}'.format(self.url))
+        except Exception as e:
+            raise TXRateBackendError("Error retrieving data from '%s'. %s" % (self.url, e.message))
 
         return rates
