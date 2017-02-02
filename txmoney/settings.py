@@ -25,7 +25,6 @@ from django.conf import settings
 from django.core.signals import setting_changed
 from django.utils.six import string_types
 
-
 DEFAULTS = {
     'DEFAULT_BACKEND_CLASS': 'txmoney.rates.backends.OpenExchangeBackend',
     'BASE_CURRENCY': 'USD',

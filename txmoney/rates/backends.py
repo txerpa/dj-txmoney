@@ -9,11 +9,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 from django.utils.six import iteritems, with_metaclass
 
-from .exceptions import TXRateBackendError
-from .models import Rate, RateSource
 from ..compat import urlopen
 from ..settings import txmoney_settings as settings
 from ..utils import parse_rates_to_base_currency
+from .exceptions import TXRateBackendError
+from .models import Rate, RateSource
 
 
 class BaseRateBackend(with_metaclass(ABCMeta)):
