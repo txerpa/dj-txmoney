@@ -11,6 +11,6 @@ def update_rates():
     """
     Obtiene los tipos de cambio para el 'backend' configurado
     """
-    backend_class = settings.DEFAULT_BACKEND
+    backend_class = settings.DEFAULT_BACKEND_CLASS
     backend = backend_class()
     backend.update_rates()

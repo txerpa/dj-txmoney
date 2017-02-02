@@ -2,13 +2,11 @@
 from __future__ import absolute_import, unicode_literals
 
 from datetime import date
-from decimal import Decimal
 
 from django.db import models
 from django.utils.functional import cached_property
 
 from ..settings import txmoney_settings as settings
-from .exceptions import RateDoesNotExist
 
 
 class RateSource(models.Model):
@@ -26,20 +24,17 @@ class RateSource(models.Model):
 
 class RateQuerySet(models.QuerySet):
 
-    def get_rate_currency_by_date(self, currency, currency_date=None):
+    def get_for_date(self, currency, currency_date=None):
         """
-        Get currency for a date
-        :param currency: base currency.
-        :param currency_date: rate currency date.
-        :return: Currency
+        Return currency rate for a date or first oldest.
+
+        If not `currency_date` is given today is used.
         """
-        currency_date = currency_date if currency_date else date.today()
+        currency_date = currency_date or date.today()
         try:
-            backend = settings.DEFAULT_BACKEND()
-            backend.update_rates()  # Only update if backend is not updated
             return self.filter(currency=currency, date__lte=currency_date).order_by('-date')[:1].get()
         except Rate.DoesNotExist:
-            raise RateDoesNotExist(currency, currency_date)
+            raise Rate.DoesNotExist("No '%s' rate for '%s' or older date", currency, date)
 
 
 class Rate(models.Model):
@@ -52,23 +47,3 @@ class Rate(models.Model):
 
     class Meta:
         unique_together = ('source', 'currency', 'date')
-
-    @staticmethod
-    def get_ratio(from_currency, to_currency, ratio_date=None):
-        """
-        Calculate exchange ratio between two currencies for a date
-        :param from_currency: base currency.
-        :param to_currency: ratio currency.
-        :param ratio_date: ratio date
-        :return: Decimal
-        """
-        ratio_date = ratio_date if ratio_date else date.today()
-        # If not default currency get date base currency rate value because all rates are for base currency
-        ratio = Decimal(1) if from_currency == settings.BASE_CURRENCY else \
-            Rate.objects.get_rate_currency_by_date(from_currency, ratio_date).value
-
-        if to_currency != settings.BASE_CURRENCY:
-            money_rate = Decimal(1) / Rate.objects.get_rate_currency_by_date(to_currency, ratio_date).value
-            ratio *= money_rate
-
-        return ratio

@@ -46,8 +46,10 @@ SECRET_KEY = "not needed"
 SITE_ID = 1
 
 TXMONEY = {
-    "BACKEND_KEY": os.environ.get("BACKEND_KEY"),
     "BASE_CURRENCY": "EUR",
+    "OPENEXCHANGE": {
+        "app_id": os.environ.get("OPENEXCHANGE_APP_ID")
+    }
 }
 
 USE_TZ = True
