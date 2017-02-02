@@ -1,26 +1,30 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from decimal import Decimal
 
-from six import iteritems
+from django.utils.six import iteritems
 
 from txmoney.money.models.models import CURRENCIES
 from txmoney.settings import txmoney_settings as settings
 
 
-def parse_rates_to_base_currency(rates, rates_currency):
+def parse_rates_to_base_currency(rates, origin_currency):
     """
-    Exchange rates list to system base currency
-    :param rates: rates list
-    :param rates_currency: list base currency
+    Exchange rates dictionary in some currency to system currency.
+    System currency *MUST* be present in the dictionary.
     """
-    rate = Decimal(1) / rates[rates_currency]  # TODO: utilizar funcion get ratio
+    assert isinstance(rates, dict), "rates is not a dictionary"
 
-    del rates[rates_currency]
+    try:
+        rate = Decimal(1) / rates[settings.BASE_CURRENCY]
+    except KeyError:
+        raise KeyError("System currency '%s' not found in rates dictionary", settings.BASE_CURRENCY)
+
+    del rates[settings.BASE_CURRENCY]
     for currency, value in iteritems(rates):
         rates[currency] = value * rate
-    rates[settings.BASE_CURRENCY] = rate
+    rates[origin_currency] = rate
 
     return rates
 

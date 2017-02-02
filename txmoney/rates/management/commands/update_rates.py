@@ -20,7 +20,7 @@ class Command(BaseCommand):
             except AttributeError:
                 raise CommandError('Cannot find custom backend "%s". Is it correct' % options['backend_path'])
         else:
-            backend_class = settings.DEFAULT_BACKEND
+            backend_class = settings.DEFAULT_BACKEND_CLASS
 
         backend = backend_class()
         try:

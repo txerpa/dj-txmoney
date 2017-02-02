@@ -3,6 +3,11 @@
 from django import VERSION
 from django.db.models.manager import ManagerDescriptor
 
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
+
 
 def setup_managers(sender):
     from txmoney.money.models.managers import money_manager

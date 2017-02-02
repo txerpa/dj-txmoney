@@ -128,20 +128,18 @@ class Money(object):
                 except:
                     raise IncorrectMoneyInputError('Cannot initialize with amount {}'.format(amount))
 
-        if not currency:
-            currency = settings.BASE_CURRENCY
+        currency = currency or settings.BASE_CURRENCY
 
         if not isinstance(currency, Currency):
             currency = Currency.get_by_code(currency)
 
         self._currency = currency
         assert isinstance(self._amount, Decimal)
-        assert isinstance(self._currency, Currency)
 
     @property
     def amount(self):
         """
-        Amount in decimal full precision
+        Amount with full precision
         :return: deciamal
         """
         return self._amount
@@ -149,8 +147,7 @@ class Money(object):
     @property
     def amount_rounded(self):
         """
-        Amount in decimal currency precision
-        :return:
+        Amount with currency precision
         """
         decimals = Decimal(10) ** -self._currency.decimals
         return self._amount.quantize(decimals, rounding=ROUND_HALF_UP)
