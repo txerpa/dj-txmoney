@@ -3,8 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.management.base import BaseCommand, CommandError
 
-from txmoney.settings import txmoney_settings as settings
-from txmoney.settings import import_from_string
+from ....settings import txmoney_settings as settings
+from ....settings import import_from_string
 
 
 class Command(BaseCommand):

@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from .fields import MoneyField  # noqa
+from .money import Currency, Money  # noqa

@@ -56,7 +56,7 @@ setup(
         'txmoney',
     ],
     include_package_data=True,
-    install_requires=["Django>=1.8", "celery>=3.1.25", "six>=1.10"],
+    install_requires=["Django>=1.8", "celery>=3.1.25"],
     license="MIT",
     zip_safe=False,
     keywords='dj-txmoney txmoney money currency finance rates',

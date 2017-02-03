@@ -5,7 +5,7 @@ import pytest
 
 from tests.testapp.models import SimpleMoneyModel
 from tests.testapp.serializers import SimpleMoneyModelSerializer
-from txmoney.money.models.models import Money
+from txmoney.money.models.money import Money
 
 
 @pytest.mark.django_db

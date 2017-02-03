@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import absolute_import, unicode_literals
+
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import BaseExpression, F
@@ -5,11 +8,9 @@ from django.db.models.sql import Query
 from django.db.models.sql.constants import QUERY_TERMS
 from django.utils.six import wraps
 
-from txmoney.money.models.fields import CurrencyField, MoneyField
-from txmoney.money.models.models import Money
-from txmoney.money.models.utils import (
-    get_currency_field_name, prepare_expression
-)
+from .fields import CurrencyField, MoneyField
+from .money import Money
+from .utils import get_currency_field_name, prepare_expression
 
 try:
     from django.utils.encoding import smart_unicode

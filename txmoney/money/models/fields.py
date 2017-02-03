@@ -13,13 +13,11 @@ from django.db.models.expressions import (
 from django.db.models.signals import class_prepared
 from django.utils.six import string_types
 
-from txmoney.compat import setup_managers
-from txmoney.money.exceptions import NotSupportedLookup
-from txmoney.money.models.models import Currency, Money
-from txmoney.money.models.utils import (
-    get_currency_field_name, prepare_expression
-)
-from txmoney.settings import txmoney_settings as settings
+from ...compat import setup_managers
+from ...settings import txmoney_settings as settings
+from ..exceptions import NotSupportedLookup
+from .money import Currency, Money
+from .utils import get_currency_field_name, prepare_expression
 
 try:
     from django.utils.encoding import smart_unicode

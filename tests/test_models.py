@@ -16,7 +16,7 @@ from tests.testapp.models import (
 )
 from txmoney.money.exceptions import NotSupportedLookup
 from txmoney.money.models.fields import MoneyField
-from txmoney.money.models.models import Money
+from txmoney.money.models.money import Money
 
 pytestmark = pytest.mark.django_db
 
