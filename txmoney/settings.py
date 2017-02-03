@@ -22,22 +22,18 @@ from __future__ import absolute_import, unicode_literals
 from importlib import import_module
 
 from django.conf import settings
+from django.core.signals import setting_changed
 from django.utils.six import string_types
-
-
-USER_SETTINGS = getattr(settings, 'TXMONEY', None)
 
 DEFAULTS = {
     'DEFAULT_BACKEND_CLASS': 'txmoney.rates.backends.OpenExchangeBackend',
     'DEFAULT_CURRENCY': 'USD',
     'SAME_BASE_CURRENCY': True,
 
-    'OPENEXCHANGE': {
-        'name': 'openexchangerates.org',
-        'url': 'https://openexchangerates.org',
-        'base_currency': 'USD',
-        'app_id': ''
-    }
+    'OPENEXCHANGE_NAME': 'openexchangerates.org',
+    'OPENEXCHANGE_URL': 'https://openexchangerates.org',
+    'OPENEXCHANGE_BASE_CURRENCY': 'USD',
+    'OPENEXCHANGE_APP_ID': '',
 }
 
 # List of settings that may be in string import notation.
@@ -51,7 +47,9 @@ def perform_import(val, setting_name):
     If the given setting is a string import notation,
     then perform the necessary import or imports.
     """
-    if isinstance(val, string_types):
+    if val is None:
+        return None
+    elif isinstance(val, string_types):
         return import_from_string(val, setting_name)
     elif isinstance(val, (list, tuple)):
         return [import_from_string(item, setting_name) for item in val]
@@ -86,9 +84,16 @@ class TXMoneySettings(object):
     and return the class, rather than the string literal.
     """
     def __init__(self, user_settings=None, defaults=None, import_strings=None):
-        self.user_settings = user_settings or USER_SETTINGS
+        if user_settings:
+            self._user_settings = user_settings
         self.defaults = defaults or DEFAULTS
         self.import_strings = import_strings or IMPORT_STRINGS
+
+    @property
+    def user_settings(self):
+        if not hasattr(self, '_user_settings'):
+            self._user_settings = getattr(settings, 'TXMONEY', {})
+        return self._user_settings
 
     def __getattr__(self, attr):
         if attr not in self.defaults:
@@ -110,4 +115,14 @@ class TXMoneySettings(object):
         return val
 
 
-txmoney_settings = TXMoneySettings()
+txmoney_settings = TXMoneySettings(None, DEFAULTS, IMPORT_STRINGS)
+
+
+def reload_api_settings(**kwargs):
+    global txmoney_settings
+    setting, value = kwargs['setting'], kwargs['value']
+    if setting == 'TXMONEY':
+        txmoney_settings = TXMoneySettings(value, DEFAULTS, IMPORT_STRINGS)
+
+
+setting_changed.connect(reload_api_settings)

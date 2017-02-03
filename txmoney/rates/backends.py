@@ -60,13 +60,13 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
 class OpenExchangeBackend(BaseRateBackend):
     def __init__(self):
         super(OpenExchangeBackend, self).__init__(
-            settings.OPENEXCHANGE['name'], settings.OPENEXCHANGE['base_currency']
+            settings.OPENEXCHANGE_NAME, settings.OPENEXCHANGE_BASE_CURRENCY
         )
 
-        if not settings.OPENEXCHANGE.get('url'):
+        if not settings.OPENEXCHANGE_URL:
             raise ImproperlyConfigured('OPENEXCHANGE URL setting should not be empty when using OpenExchangeBackend')
 
-        if not settings.OPENEXCHANGE.get('app_id'):
+        if not settings.OPENEXCHANGE_APP_ID:
             raise ImproperlyConfigured('OPENEXCHANGE APP_ID setting should not be empty when using OpenExchangeBackend')
 
         self.url = '{}?app_id={}'.format(settings.OPENEXCHANGE_URL, settings.BACKEND_KEY)
