@@ -3,8 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ....settings import txmoney_settings as settings
-from ....settings import import_from_string
+from ....settings import import_from_string, txmoney_settings
 
 
 class Command(BaseCommand):
@@ -20,7 +19,7 @@ class Command(BaseCommand):
             except AttributeError:
                 raise CommandError('Cannot find custom backend "%s". Is it correct' % options['backend_path'])
         else:
-            backend_class = settings.DEFAULT_BACKEND_CLASS
+            backend_class = txmoney_settings.DEFAULT_BACKEND_CLASS
 
         backend = backend_class()
         try:

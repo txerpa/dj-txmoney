@@ -27,7 +27,7 @@ from django.utils.six import string_types
 
 DEFAULTS = {
     'DEFAULT_BACKEND_CLASS': 'txmoney.rates.backends.OpenExchangeBackend',
-    'BASE_CURRENCY': 'USD',
+    'DEFAULT_CURRENCY': 'USD',
     'SAME_BASE_CURRENCY': True,
 
     'OPENEXCHANGE': {
@@ -120,7 +120,7 @@ class TXMoneySettings(object):
 txmoney_settings = TXMoneySettings(None, DEFAULTS, IMPORT_STRINGS)
 
 
-def reload_api_settings(*args, **kwargs):
+def reload_api_settings(**kwargs):
     global txmoney_settings
     setting, value = kwargs['setting'], kwargs['value']
     if setting == 'TXMONEY':

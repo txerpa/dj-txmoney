@@ -8,15 +8,9 @@ from django.db.models.sql import Query
 from django.db.models.sql.constants import QUERY_TERMS
 from django.utils.six import wraps
 
-from .fields import CurrencyField, MoneyField
+from .fields import CurrencyField, MoneyField, smart_unicode
 from .money import Money
 from .utils import get_currency_field_name, prepare_expression
-
-try:
-    from django.utils.encoding import smart_unicode
-except ImportError:
-    from django.utils.encoding import smart_text as smart_unicode
-
 
 RELEVANT_QUERYSET_METHODS = ('distinct', 'get', 'get_or_create', 'filter', 'exclude')
 EXPAND_EXCLUSIONS = {
@@ -216,7 +210,7 @@ def money_manager(manager):
     # * Returning a new MoneyManager instance (rather than modifying
     #   the passed in manager instance). This fails for reasons that
     #   are tricky to get to the bottom of - Manager does funny things.
-    class MoneyManager(manager.__class__):
+    class MoneyManager(manager.__class__, object):
 
         def get_queryset(self, *args, **kwargs):
             # If we are calling code that is pre-Django 1.6, need to

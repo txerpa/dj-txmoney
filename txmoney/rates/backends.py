@@ -1,15 +1,14 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals
 
-import json
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal
 
+import requests
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 from django.utils.six import iteritems, with_metaclass
 
-from ..compat import urlopen
 from ..settings import txmoney_settings as settings
 from .exceptions import TXRateBackendError
 from .models import Rate, RateSource
@@ -22,7 +21,6 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
     """
 
     def __init__(self, source_name, base_currency):
-        # TODO: validate if currency is system avaliable
         self._source_name = source_name
         self._base_currency = base_currency
 
@@ -75,11 +73,10 @@ class OpenExchangeBackend(BaseRateBackend):
 
     def get_rates_from_source(self):
         try:
-            data = urlopen(self.url).read().decode("utf-8")
-            rates = json.loads(data, parse_float=Decimal)['rates']
-            # rates = clean_rates(rates) TODO: clean rates
+            r = requests.get(self.url, encoding='utf-8')
+            rates = r.json(parse_float=Decimal)['rates']
 
-            if settings.SAME_BASE_CURRENCY and settings.BASE_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
+            if settings.SAME_BASE_CURRENCY and settings.DEFAULT_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
                 rates = parse_rates_to_base_currency(rates, settings.OPENEXCHANGE_BASE_CURRENCY)
         except Exception as e:
             raise TXRateBackendError("Error retrieving rates from '%s'. %s" % (self.url, e.message))

@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from django.utils.six import iteritems
 
-from ..settings import txmoney_settings as settings
+from ..settings import txmoney_settings
 from .models import Rate
 
 
@@ -18,9 +18,9 @@ def exchange_ratio(currency_from, currency_to, ratio_date=None):
     rate_from = rate_to = Decimal(1)
 
     if currency_from != currency_to:
-        if currency_from != settings.BASE_CURRENCY:
+        if currency_from != txmoney_settings.DEFAULT_CURRENCY:
             rate_from = Rate.objects.get_for_date(currency_from, ratio_date).value
-        if currency_to != settings.BASE_CURRENCY:
+        if currency_to != txmoney_settings.DEFAULT_CURRENCY:
             rate_to = Rate.objects.get_for_date(currency_to, ratio_date).value
 
     return rate_to / rate_from
@@ -34,11 +34,11 @@ def parse_rates_to_base_currency(rates, origin_currency):
     assert isinstance(rates, dict), "rates is not a dictionary"
 
     try:
-        rate = Decimal(1) / rates[settings.BASE_CURRENCY]
+        rate = Decimal(1) / rates[txmoney_settings.DEFAULT_CURRENCY]
     except KeyError:
-        raise KeyError("System currency '%s' not found in rates dictionary", settings.BASE_CURRENCY)
+        raise KeyError("System currency '%s' not found in rates dictionary", txmoney_settings.DEFAULT_CURRENCY)
 
-    del rates[settings.BASE_CURRENCY]
+    del rates[txmoney_settings.DEFAULT_CURRENCY]
     for currency, value in iteritems(rates):
         rates[currency] = value * rate
     rates[origin_currency] = rate

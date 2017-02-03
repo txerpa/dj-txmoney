@@ -57,7 +57,7 @@ class MoneyField(Field):
         Override this method to disable the precision validation for input
         values or to enhance it in any way you need to.
         """
-        sign, digittuple, exponent = value.amount.as_tuple()
+        _, digittuple, exponent = value.amount.as_tuple()
 
         if exponent >= 0:
             # 1234500.0

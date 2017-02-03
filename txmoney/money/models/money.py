@@ -25,14 +25,6 @@ class Currency(object):
     """
 
     def __init__(self, code, numeric='', name='', symbol='', decimals=2, countries=None):
-        """
-        :param code: (Unicode) ISO 4217 currency code
-        :param numeric: (Integer) ISO 4217 currency number
-        :param name: (Unicode) currency name
-        :param symbol: (Unicode) currency symbol
-        :param decimals: (Integer) currency decimals
-        :param countries: (Unicode list) countries which currency is main currency
-        """
         if not countries:
             countries = []
         self.code = code
@@ -60,7 +52,6 @@ class Currency(object):
         """
         Search a currency by its code.
         :param code: (String) ISO 4217 currency code
-        :return: (Currency) currency
         """
         try:
             return CURRENCIES[str(code).upper()]
@@ -70,8 +61,7 @@ class Currency(object):
     @staticmethod
     def all():
         """
-        Get all currencies which system allows.
-        :return: (Dictionary) Currencies
+        Get all system currencies.
         """
         return CURRENCIES
 
@@ -104,12 +94,10 @@ class Money(object):
         Money(Decimal('123.0'), Currency(code='AAA', name='My Currency')  # 123.0 AAA
     """
 
-    def __init__(self, amount=0, currency=None):
+    def __init__(self, amount=Decimal(0.0), currency=None):
         if isinstance(amount, Decimal):
             if amount in (Decimal('Inf'), Decimal('-Inf')):
-                raise IncorrectMoneyInputError(
-                    'Cannot initialize with infinity amount'.format(currency, amount)
-                )
+                raise IncorrectMoneyInputError("Cannot initialize '%s' with infinity amount" % currency)
             self._amount = amount
         else:
             try:
@@ -126,7 +114,7 @@ class Money(object):
                 except:
                     raise IncorrectMoneyInputError('Cannot initialize with amount {}'.format(amount))
 
-        currency = currency or settings.BASE_CURRENCY
+        currency = currency or settings.DEFAULT_CURRENCY
 
         if not isinstance(currency, Currency):
             currency = Currency.get_by_code(currency)
@@ -159,7 +147,7 @@ class Money(object):
         s = str(value).strip()
         try:
             amount = Decimal(s)
-            currency = settings.BASE_CURRENCY
+            currency = settings.DEFAULT_CURRENCY
         except InvalidOperation:
             try:
                 amount = Decimal(s[:len(s) - 3].strip())
@@ -311,7 +299,7 @@ class Money(object):
 
         return results
 
-    def exchange_to(self, currency=settings.BASE_CURRENCY, rate_date=date.today()):
+    def exchange_to(self, currency=settings.DEFAULT_CURRENCY, rate_date=date.today()):
         """
         Exchange money object to given currency for a date.
 

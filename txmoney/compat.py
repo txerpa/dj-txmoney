@@ -1,19 +1,15 @@
-# -*- coding: utf-8 -*-
-# flake8: noqa
+# coding=utf-8
+from __future__ import absolute_import, unicode_literals
+
 from django import VERSION
 from django.db.models.manager import ManagerDescriptor
 
-try:
-    from urllib2 import urlopen
-except ImportError:
-    from urllib.request import urlopen
-
 
 def setup_managers(sender):
-    from txmoney.money.models.managers import money_manager
+    from .money.models.managers import money_manager
 
     if VERSION >= (1, 10):
-        for manager in filter(lambda m: m.name == 'objects', sender._meta.managers):
+        for manager in [m for m in sender._meta.managers if m.name == 'objects']:
             setattr(sender, manager.name, ManagerDescriptor(money_manager(manager)))
     else:
         sender.copy_managers([

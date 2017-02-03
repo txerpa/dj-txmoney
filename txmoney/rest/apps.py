@@ -11,7 +11,7 @@ class TXMoneyRestAppConfig(AppConfig):
 
     def ready(self):
         """
-        update Django Rest Framework serializer mappings
+        Update Django Rest Framework serializer mappings
         """
         from rest_framework.serializers import ModelSerializer
         from ..money.models import fields
