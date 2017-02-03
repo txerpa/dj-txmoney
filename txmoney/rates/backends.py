@@ -60,7 +60,7 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
 class OpenExchangeBackend(BaseRateBackend):
     def __init__(self):
         super(OpenExchangeBackend, self).__init__(
-            settings.OPENEXCHANGE_NAME, settings.OPENEXCHANGE_BASE_CURRENCY
+            settings.OPENEXCHANGE['name'], settings.OPENEXCHANGE['base_currency']
         )
 
         if not settings.OPENEXCHANGE.get('url'):
