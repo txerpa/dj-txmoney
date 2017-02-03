@@ -73,7 +73,7 @@ class OpenExchangeBackend(BaseRateBackend):
 
     def get_rates_from_source(self):
         try:
-            r = requests.get(self.url, encoding='utf-8')
+            r = requests.get(self.url)
             rates = r.json(parse_float=Decimal)['rates']
 
             if settings.SAME_BASE_CURRENCY and settings.DEFAULT_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:

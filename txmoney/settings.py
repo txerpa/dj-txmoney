@@ -31,7 +31,7 @@ DEFAULTS = {
     'SAME_BASE_CURRENCY': True,
 
     'OPENEXCHANGE_NAME': 'openexchangerates.org',
-    'OPENEXCHANGE_URL': 'https://openexchangerates.org',
+    'OPENEXCHANGE_URL': 'https://openexchangerates.org/api/latest.json',
     'OPENEXCHANGE_BASE_CURRENCY': 'USD',
     'OPENEXCHANGE_APP_ID': '',
 }
