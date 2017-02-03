@@ -69,7 +69,7 @@ class OpenExchangeBackend(BaseRateBackend):
         if not settings.OPENEXCHANGE_APP_ID:
             raise ImproperlyConfigured('OPENEXCHANGE APP_ID setting should not be empty when using OpenExchangeBackend')
 
-        self.url = '{}?app_id={}'.format(settings.OPENEXCHANGE_URL, settings.BACKEND_KEY)
+        self.url = '{}?app_id={}'.format(settings.OPENEXCHANGE_URL, settings.OPENEXCHANGE_APP_ID)
 
     def get_rates_from_source(self):
         try:
