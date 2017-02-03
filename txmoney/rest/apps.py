@@ -6,8 +6,7 @@ from django.apps import AppConfig
 
 class TXMoneyRestAppConfig(AppConfig):
     name = 'txmoney.rest'
-    label = 'txmoneyrest'
-    verbose_name = "TXMoney drf support"
+    verbose_name = "TXMoney DRF Support"
 
     def ready(self):
         """

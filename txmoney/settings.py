@@ -22,7 +22,6 @@ from __future__ import absolute_import, unicode_literals
 from importlib import import_module
 
 from django.conf import settings
-from django.core.signals import setting_changed
 from django.utils.six import string_types
 
 DEFAULTS = {
@@ -125,6 +124,3 @@ def reload_api_settings(**kwargs):
     setting, value = kwargs['setting'], kwargs['value']
     if setting == 'TXMONEY':
         txmoney_settings = TXMoneySettings(value, DEFAULTS, IMPORT_STRINGS)
-
-
-setting_changed.connect(reload_api_settings)

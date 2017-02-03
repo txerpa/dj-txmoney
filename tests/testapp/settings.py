@@ -11,7 +11,7 @@ DEBUG_PROPAGATE_EXCEPTIONS = True
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("DATABASE_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("DATABASE_NAME", "txmoney"),
+        "NAME": os.environ.get("DATABASE_NAME", ":memory:"),
         'USER': os.environ.get("DATABASE_USER", ""),
         'PASSWORD': os.environ.get("DATABASE_PASSWORD", ""),
     }
@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sites",
     "rest_framework",
-    "txmoney.rates.apps.TXMoneyConfig",
+    "txmoney.apps.TXMoneyConfig",
     "txmoney.rest.apps.TXMoneyRestAppConfig",
     "tests.testapp"
 ]

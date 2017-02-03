@@ -4,10 +4,9 @@ from __future__ import absolute_import, unicode_literals
 from django.apps import AppConfig
 
 
-class TXMoneyConfig(AppConfig):
+class TXMoneyRatesConfig(AppConfig):
     name = 'txmoney.rates'
-    label = 'txmoney'
-    verbose_name = "TXMoney"
+    verbose_name = "TXMoney Rates"
 
     def ready(self):
         pass
