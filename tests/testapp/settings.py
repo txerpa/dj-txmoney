@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sites",
     "rest_framework",
-    "txmoney.apps.TXMoneyConfig",
+    "txmoney.rates.apps.TXMoneyRatesConfig",
     "txmoney.rest.apps.TXMoneyRestAppConfig",
     "tests.testapp"
 ]
