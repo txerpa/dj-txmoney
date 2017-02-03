@@ -1,1 +1,1 @@
-default_app_config = 'txmoney.rest.apps.TXMoneyRestAppConfig'
+default_app_config = 'txmoney.rates.apps.TXMoneyRatesConfig'
