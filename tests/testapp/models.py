@@ -7,7 +7,7 @@ from django.db import models
 
 from txmoney.money.models.fields import MoneyField
 from txmoney.money.models.managers import money_manager, understands_money
-from txmoney.money.models.models import Money
+from txmoney.money.models.money import Money
 
 
 class SimpleMoneyModel(models.Model):

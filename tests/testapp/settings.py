@@ -46,7 +46,7 @@ SECRET_KEY = "not needed"
 SITE_ID = 1
 
 TXMONEY = {
-    "BASE_CURRENCY": "EUR",
+    "DEFAULT_CURRENCY": "EUR",
     "OPENEXCHANGE": {
         "app_id": os.environ.get("OPENEXCHANGE_APP_ID")
     }

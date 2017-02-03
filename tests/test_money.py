@@ -8,7 +8,7 @@ import pytest
 from txmoney.money.exceptions import (
     CurrencyDoesNotExist, CurrencyMismatch, IncorrectMoneyInputError
 )
-from txmoney.money.models.models import CURRENCIES, Currency, Money
+from txmoney.money.models.money import CURRENCIES, Currency, Money
 from txmoney.settings import txmoney_settings as settings
 
 
@@ -93,7 +93,7 @@ class TestMoney(object):
         (Money(Decimal('10.50'), 'EUR'), Decimal('10.50'), 'EUR'),
         (Money(Decimal('-10.50'), 'EUR'), Decimal('-10.50'), 'EUR'),
         # Unspecified currency
-        (Money(10), Decimal(10), settings.BASE_CURRENCY),
+        (Money(10), Decimal(10), settings.DEFAULT_CURRENCY),
         # Unspecified amount
         (Money(currency='EUR'), 0, 'EUR'),
         # Internal type
@@ -155,8 +155,8 @@ class TestMoney(object):
 
     MONEY_STRINGS = [
         # Default currency:
-        (Money(' 123'), '123 {}'.format(settings.BASE_CURRENCY),),
-        (Money('-123'), '-123 {}'.format(settings.BASE_CURRENCY),),
+        (Money(' 123'), '123 {}'.format(settings.DEFAULT_CURRENCY),),
+        (Money('-123'), '-123 {}'.format(settings.DEFAULT_CURRENCY),),
         # Test a currency with decimals:
         (Money('123', 'EUR'), '123 EUR',),
         (Money('-123', 'EUR'), '-123 EUR',),
@@ -403,8 +403,8 @@ class TestMoney(object):
     def test_string_parse_default_currency(self):
         value = Money.from_string('100.35')
         assert value.amount == Decimal('100.35')
-        assert value.currency == settings.BASE_CURRENCY
-        assert value.currency == CURRENCIES[settings.BASE_CURRENCY]
+        assert value.currency == settings.DEFAULT_CURRENCY
+        assert value.currency == CURRENCIES[settings.DEFAULT_CURRENCY]
 
     MONEY_ROUND = [
         (lambda: Money('123.001', 'EUR').round(), Money('123', 'EUR')),
