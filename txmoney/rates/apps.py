@@ -10,4 +10,4 @@ class TXMoneyRatesConfig(AppConfig):
     verbose_name = "TXMoney Rates"
 
     def ready(self):
-        from .tasks import update_rates  # noqa
+        pass
