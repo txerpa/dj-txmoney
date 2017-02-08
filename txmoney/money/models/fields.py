@@ -250,7 +250,7 @@ class MoneyField(models.DecimalField):
         if isinstance(value, Expression):
             return value
         if isinstance(value, Money):
-            value = value.amount
+            value = value.amount_rounded
         return super(MoneyField, self).get_db_prep_save(value, connection)
 
     def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
