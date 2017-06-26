@@ -239,9 +239,16 @@ class MoneyField(models.DecimalField):
         """
         Adds CurrencyField instance to a model class.
         """
-        currency_field = CurrencyField(
-            max_length=3, price_field=self, default=self.default_currency, editable=False
-        )
+        kwargs = {
+            'max_length': 3,
+            'price_field': self,
+            'default': self.default_currency,
+            'editable': False
+        }
+        if self.db_column is not None:
+            kwargs['db_column'] = get_currency_field_name(self.db_column)
+
+        currency_field = CurrencyField(**kwargs)
         currency_field.creation_counter = self.creation_counter - 1
         currency_field_name = get_currency_field_name(name)
         cls.add_to_class(currency_field_name, currency_field)
