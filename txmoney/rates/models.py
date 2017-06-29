@@ -40,7 +40,7 @@ class RateQuerySet(models.QuerySet):
         try:
             return self.filter(currency=currency, date__lte=currency_date).order_by('-date')[:1].get()
         except Rate.DoesNotExist:
-            raise Rate.DoesNotExist("No {} rate for {} or older date".format(currency, date))
+            raise Rate.DoesNotExist("No {} rate for {} or older date".format(currency, currency_date))
 
 
 @python_2_unicode_compatible
