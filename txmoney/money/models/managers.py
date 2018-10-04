@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import BaseExpression, F
 from django.db.models.sql import Query
-from django.db.models.sql.constants import QUERY_TERMS
+from txmoney.money.constants import QUERY_TERMS
 from django.utils.six import wraps
 
 from .fields import CurrencyField, MoneyField, smart_unicode
