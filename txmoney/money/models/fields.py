@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from decimal import Decimal
 
@@ -111,7 +110,7 @@ def setup_default(default, default_currency, nullable):
     elif isinstance(default, (float, Decimal, int)):
         default = Money(default, default_currency)
     if not (nullable and default is None) and not isinstance(default, Money):
-        raise ValueError('Default value must be an instance of Money, is: %s' % default)
+        raise ValueError(f'Default value must be an instance of Money, is: {default}')
     return default
 
 

@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 import subprocess
@@ -47,7 +46,7 @@ def isort_main(args):
 
 def split_class_and_function(string):
     class_string, function_string = string.split('.', 1)
-    return "%s and %s" % (class_string, function_string)
+    return f'{class_string} and {function_string}'
 
 
 def is_function(string):
@@ -58,6 +57,7 @@ def is_function(string):
 def is_class(string):
     # `True` if first character is uppercase - assume it's a class name.
     return string[0] == string[0].upper()
+
 
 if __name__ == "__main__":
     try:

@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, division, unicode_literals
 
 from decimal import Decimal
 
@@ -155,8 +154,8 @@ class TestMoney(object):
 
     MONEY_STRINGS = [
         # Default currency:
-        (Money(' 123'), '123 {}'.format(settings.DEFAULT_CURRENCY),),
-        (Money('-123'), '-123 {}'.format(settings.DEFAULT_CURRENCY),),
+        (Money(' 123'), f'123 {settings.DEFAULT_CURRENCY}',),
+        (Money('-123'), f'-123 {settings.DEFAULT_CURRENCY}',),
         # Test a currency with decimals:
         (Money('123', 'EUR'), '123 EUR',),
         (Money('-123', 'EUR'), '-123 EUR',),

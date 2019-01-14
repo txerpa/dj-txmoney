@@ -4,10 +4,7 @@ import os
 import re
 import sys
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
 
 def get_version(*file_paths):
@@ -56,23 +53,19 @@ setup(
         'txmoney',
     ],
     include_package_data=True,
-    install_requires=["Django>=1.8", "celery>=3.1.0", "requests>= 2.12"],
+    install_requires=["Django==2.1.5", "celery>=3.1.0", "requests>= 2.12"],
     license="MIT",
     zip_safe=False,
     keywords='dj-txmoney txmoney money currency finance rates',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Django',
-        'Framework :: Django :: 1.8',
-        'Framework :: Django :: 1.9',
-        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 2.1.5',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python'
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )

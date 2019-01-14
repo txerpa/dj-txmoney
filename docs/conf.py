@@ -48,8 +48,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'dj-txmoney'
-copyright = u'2016, Mateu Cànaves Albertí'
+project = 'dj-txmoney'
+copyright = '2016, Mateu Cànaves Albertí'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -194,8 +194,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'dj-txmoney.tex', u'dj-txmoney Documentation',
-   u'Mateu Cànaves Albertí', 'manual'),
+  ('index', 'dj-txmoney.tex', 'dj-txmoney Documentation',
+   'Mateu Cànaves Albertí', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -224,8 +224,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'dj-txmoney', u'dj-txmoney Documentation',
-     [u'Mateu Cànaves Albertí'], 1)
+    ('index', 'dj-txmoney', 'dj-txmoney Documentation',
+     ['Mateu Cànaves Albertí'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -238,8 +238,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'dj-txmoney', u'dj-txmoney Documentation',
-   u'Mateu Cànaves Albertí', 'dj-txmoney', 'One line description of project.',
+  ('index', 'dj-txmoney', 'dj-txmoney Documentation',
+   'Mateu Cànaves Albertí', 'dj-txmoney', 'One line description of project.',
    'Miscellaneous'),
 ]
 

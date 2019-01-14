@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 import pytest
 from django import VERSION
@@ -72,7 +71,7 @@ class TestMoneyField(object):
     def test_not_supported_lookup(self):
         with pytest.raises(NotSupportedLookup) as exc:
             SimpleMoneyModel.objects.filter(amount__regex='\d+').count()
-        assert str(exc.value) == "Lookup 'regex' is not supported for MoneyField"
+        assert str(exc.value) == 'Lookup "regex" is not supported for MoneyField'
 
     @pytest.fixture
     def objects_setup(self):

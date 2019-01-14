@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -17,7 +16,7 @@ class Command(BaseCommand):
             try:
                 backend_class = import_from_string(options['backend_path'], '')
             except AttributeError:
-                raise CommandError('Cannot find custom backend "%s". Is it correct' % options['backend_path'])
+                raise CommandError(f'Cannot find custom backend "{options["backend_path"]}". Is it correct')
         else:
             backend_class = txmoney_settings.DEFAULT_BACKEND_CLASS
 
@@ -25,6 +24,6 @@ class Command(BaseCommand):
         try:
             backend.update_rates()
         except Exception as e:
-            raise CommandError('%s' % e.message)
+            raise CommandError(f'{e}')
 
-        self.stdout.write('Successfully updated rates for "%s"' % backend.source_name)
+        self.stdout.write(f'Successfully updated rates for "{backend.source_name}"')

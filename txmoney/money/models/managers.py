@@ -1,12 +1,12 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import BaseExpression, F
 from django.db.models.sql import Query
-from txmoney.money.constants import QUERY_TERMS
 from django.utils.six import wraps
+
+from txmoney.money.constants import QUERY_TERMS
 
 from .fields import CurrencyField, MoneyField, smart_unicode
 from .money import Money

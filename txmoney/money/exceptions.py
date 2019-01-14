@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 
 class TXMoneyException(Exception):
@@ -15,7 +14,7 @@ class CurrencyDoesNotExist(TXMoneyException):
     Invalid currency
     """
     def __init__(self, code):
-        msg = 'No currency with code {} is defined'.format(code)
+        msg = f'No currency with code {code} is defined'
         super(CurrencyDoesNotExist, self).__init__(msg)
 
 
@@ -41,4 +40,4 @@ class InvalidMoneyOperation(TXMoneyException, TypeError):
 
 class NotSupportedLookup(TXMoneyException):
     def __init__(self, lookup):
-        super(NotSupportedLookup, self).__init__("Lookup '%s' is not supported for MoneyField" % lookup)
+        super(NotSupportedLookup, self).__init__(f'Lookup "{lookup}" is not supported for MoneyField')

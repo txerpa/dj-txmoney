@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal
@@ -54,7 +53,7 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
                 Rate.objects.bulk_create(rates)
                 source.save()  # Force update last_update date on rate source
         except Exception as e:
-            raise TXRateBackendError("Error during '%s' rates update. %s" % (self.source_name, e.message))
+            raise TXRateBackendError(f'Error during "{self.source_name}" rates update. {e}')
 
 
 class OpenExchangeBackend(BaseRateBackend):
@@ -69,7 +68,7 @@ class OpenExchangeBackend(BaseRateBackend):
         if not settings.OPENEXCHANGE_APP_ID:
             raise ImproperlyConfigured('OPENEXCHANGE APP_ID setting should not be empty when using OpenExchangeBackend')
 
-        self.url = '{}?app_id={}'.format(settings.OPENEXCHANGE_URL, settings.OPENEXCHANGE_APP_ID)
+        self.url = f'{settings.OPENEXCHANGE_URL}?app_id={settings.OPENEXCHANGE_APP_ID}'
 
     def get_rates_from_source(self):
         try:
@@ -79,6 +78,6 @@ class OpenExchangeBackend(BaseRateBackend):
             if settings.SAME_BASE_CURRENCY and settings.DEFAULT_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
                 rates = parse_rates_to_base_currency(rates, settings.OPENEXCHANGE_BASE_CURRENCY)
         except Exception as e:
-            raise TXRateBackendError("Error retrieving rates from '%s'. %s" % (self.url, e.message))
+            raise TXRateBackendError(f'Error retrieving rates from "{self.url}". {e}')
 
         return rates

@@ -17,7 +17,6 @@ This module provides the `txmoney_settings` object, that is used to access
 TXMoney settings, checking for user settings first, then falling
 back to the defaults.
 """
-from __future__ import absolute_import, unicode_literals
 
 from importlib import import_module
 
@@ -66,9 +65,7 @@ def import_from_string(val, setting_name):
         module = import_module(module_path)
         return getattr(module, class_name)
     except (ImportError, AttributeError) as exp:
-        msg = "Could not import '%s' for TXMONEY setting '%s'. %s: %s." % (
-            val, setting_name, exp.__class__.__name__, exp
-        )
+        msg = f'Could not import "{val}" for TXMONEY setting "{setting_name}". {exp.__class__.__name__}: {exp}.'
         raise ImportError(msg)
 
 
@@ -97,7 +94,7 @@ class TXMoneySettings(object):
 
     def __getattr__(self, attr):
         if attr not in self.defaults:
-            raise AttributeError("Invalid TXMoney setting: '%s'" % attr)
+            raise AttributeError(f'Invalid TXMoney setting: "{attr}')
 
         try:
             # Check if present in user settings

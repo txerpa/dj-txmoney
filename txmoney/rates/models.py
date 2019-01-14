@@ -1,17 +1,14 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from datetime import date
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from ..settings import txmoney_settings as settings
 
 
-@python_2_unicode_compatible
 class RateSource(models.Model):
     name = models.CharField(max_length=100)
     base_currency = models.CharField(max_length=3, default=settings.DEFAULT_CURRENCY, blank=True)
@@ -21,7 +18,7 @@ class RateSource(models.Model):
         unique_together = ('name', 'base_currency')
 
     def __str__(self):
-        return _("%s rates in %s update %s") % (self.name, self.base_currency, self.last_update)
+        return _(f'{self.name} rates in {self.base_currency} update {self.last_update}')
 
     @cached_property
     def is_updated(self):
@@ -40,10 +37,9 @@ class RateQuerySet(models.QuerySet):
         try:
             return self.filter(currency=currency, date__lte=currency_date).order_by('-date')[:1].get()
         except Rate.DoesNotExist:
-            raise Rate.DoesNotExist("No {} rate for {} or older date".format(currency, currency_date))
+            raise Rate.DoesNotExist(f'No {currency} rate for {currency_date} or older date')
 
 
-@python_2_unicode_compatible
 class Rate(models.Model):
     source = models.ForeignKey(RateSource, on_delete=models.PROTECT, related_name='rates', related_query_name='rate')
     currency = models.CharField(max_length=3)

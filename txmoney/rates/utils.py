@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, division, unicode_literals
 
 from datetime import date
 from decimal import Decimal
@@ -36,7 +35,7 @@ def parse_rates_to_base_currency(rates, origin_currency):
     try:
         rate = Decimal(1) / rates[txmoney_settings.DEFAULT_CURRENCY]
     except KeyError:
-        raise KeyError("System currency '%s' not found in rates dictionary", txmoney_settings.DEFAULT_CURRENCY)
+        raise KeyError(f'System currency "{txmoney_settings.DEFAULT_CURRENCY}" not found in rates dictionary')
 
     del rates[txmoney_settings.DEFAULT_CURRENCY]
     for currency, value in iteritems(rates):

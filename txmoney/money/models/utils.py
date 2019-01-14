@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from django.db.models import F
 from django.db.models.expressions import BaseExpression
@@ -8,7 +7,7 @@ from .money import Money
 
 
 def get_currency_field_name(name):
-    return "{}_currency".format(name)
+    return f'{name}_currency'
 
 
 def get_amount(value):

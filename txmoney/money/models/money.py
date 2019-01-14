@@ -1,11 +1,10 @@
 # coding=utf-8
-from __future__ import absolute_import, division, unicode_literals
 
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from django.utils.encoding import smart_text
-from django.utils.six import python_2_unicode_compatible, string_types
+from django.utils.six import string_types
 from django.utils.translation import ugettext_lazy as _
 
 from ...rates.utils import exchange_ratio
@@ -66,7 +65,6 @@ class Currency(object):
         return CURRENCIES
 
 
-@python_2_unicode_compatible
 class Money(object):
     """
     A Money instance is a combination of data - an amount and a
@@ -97,7 +95,7 @@ class Money(object):
     def __init__(self, amount=Decimal(0.0), currency=None):
         if isinstance(amount, Decimal):
             if amount in (Decimal('Inf'), Decimal('-Inf')):
-                raise IncorrectMoneyInputError("Cannot initialize '%s' with infinity amount" % currency)
+                raise IncorrectMoneyInputError(f'Cannot initialize "{currency}" with infinity amount')
             self._amount = amount
         else:
             try:
@@ -107,12 +105,12 @@ class Money(object):
                     # check for the odd case of Money("123.00 EUR", "USD")
                     if currency:
                         raise IncorrectMoneyInputError(
-                            'Initialized with conflicting currencies {} {}'.format(currency, amount)
+                            f'Initialized with conflicting currencies {currency} {amount}'
                         )
 
                     self._amount, currency = self._from_string(amount)
                 except:
-                    raise IncorrectMoneyInputError('Cannot initialize with amount {}'.format(amount))
+                    raise IncorrectMoneyInputError(f'Cannot initialize with amount {amount}')
 
         currency = currency or settings.DEFAULT_CURRENCY
 
@@ -153,7 +151,7 @@ class Money(object):
                 amount = Decimal(s[:len(s) - 3].strip())
                 currency = Currency.get_by_code(s[len(s) - 3:])
             except:
-                raise IncorrectMoneyInputError('The value "{}" is not properly formatted as "123.45 XXX"'.format(s))
+                raise IncorrectMoneyInputError(f'The value "{s}" is not properly formatted as "123.45 XXX"')
         return amount, currency
 
     @classmethod
@@ -167,10 +165,10 @@ class Money(object):
     def _currency_check(self, other):
         """ Compare the currencies matches and raise if not """
         if self._currency != other.currency:
-            raise CurrencyMismatch('Currency mismatch: {} != {}'.format(self._currency, other.currency))
+            raise CurrencyMismatch(f'Currency mismatch: {self._currency} != {other.currency}')
 
     def __str__(self):
-        return '{} {}'.format(self._amount, self._currency)
+        return f'{self._amount} {self._currency}'
 
     def __repr__(self):
         return str(self)
@@ -208,7 +206,7 @@ class Money(object):
         # In the case where both values are Money, the left hand one will be
         # called. In the case where we are subtracting Money from another
         # value, we want to disallow it
-        raise TypeError('Cannot subtract Money from {}'.format(other))
+        raise TypeError(f'Cannot subtract Money from {other}')
 
     def __mul__(self, other):
         if isinstance(other, Money):
