@@ -2,7 +2,6 @@
 
 from decimal import Decimal
 
-from django import VERSION
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Field
@@ -17,6 +16,7 @@ from ...settings import txmoney_settings as settings
 from ..exceptions import NotSupportedLookup
 from .money import Currency, Money
 from .utils import get_currency_field_name, prepare_expression
+from txmoney import forms
 
 try:
     from django.utils.encoding import smart_unicode
@@ -273,17 +273,34 @@ class MoneyField(models.DecimalField):
             return self.default
         return super(MoneyField, self).get_default()
 
+    def formfield(self, **kwargs):
+        defaults = {"form_class": forms.MoneyField}
+        defaults.update(kwargs)
+        defaults["default_currency"] = self.default_currency
+        if self.default is not None:
+            defaults["default_amount"] = self.default.amount
+        return super(MoneyField, self).formfield(**defaults)
+
     def value_to_string(self, obj):
         """
         When serializing this field, we will output both value and currency.
         Here we only need to output the value. The contributed currency field
         will get called to output itself
         """
-        if VERSION < (2, 0):
-            value = self._get_val_from_obj(obj)
-        else:
-            value = self.value_from_object(obj)
+        value = self.value_from_object(obj)
         return self.get_prep_value(value)
+
+    def deconstruct(self):
+        # self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs
+        name, path, args, kwargs = super(MoneyField, self).deconstruct()
+
+        if self.default is None:
+            del kwargs["default"]
+        else:
+            kwargs["default"] = self.default.amount
+        if self.default_currency is not None and self.default_currency != settings.DEFAULT_CURRENCY:
+            kwargs["default_currency"] = str(self.default_currency)
+        return name, path, args, kwargs
 
 
 def patch_managers(sender, **kwargs):
