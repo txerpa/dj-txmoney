@@ -78,7 +78,7 @@ class Currency(object):
             kwargs.update(decimals=self.decimals)
         if self.countries is not None:
             kwargs.update(countries=self.countries)
-        return 'djmoney.money.Currency', args, kwargs
+        return 'txmoney.money.Currency', args, kwargs
 
 
 class Money(object):
