@@ -333,15 +333,14 @@ class TestProxyModel(object):
         assert ProxyMoneyModel.objects.filter(amount__gt=Money('50.00', 'GBP')).count() == 0
 
 
-@pytest.mark.parametrize(
-    'model_class', (
-        AbstractMoneyModel,
-        SimpleMoneyModel,
-        InheritorMoneyModel,
-        InheritedMoneyModel,
-        ProxyMoneyModel,
-    )
-)
+INSTANCE_ACCESS_MODELS = [SimpleMoneyModel, InheritorMoneyModel, InheritedMoneyModel, ProxyMoneyModel]
+
+if VERSION[:2] < (3, 2):
+    # Django 3.2 and later does not support AbstractModel instancing
+    INSTANCE_ACCESS_MODELS.append(AbstractMoneyModel)
+
+
+@pytest.mark.parametrize('model_class', INSTANCE_ACCESS_MODELS)
 def test_manager_instance_access(model_class):
     with pytest.raises(AttributeError):
         model_class().objects.all()
