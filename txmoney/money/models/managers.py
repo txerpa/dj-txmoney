@@ -4,11 +4,12 @@ from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import BaseExpression, F
 from django.db.models.sql import Query
-from django.utils.six import wraps
+from django.utils.encoding import smart_str
+from functools import wraps
 
 from txmoney.money.constants import QUERY_TERMS
 
-from .fields import CurrencyField, MoneyField, smart_unicode
+from .fields import CurrencyField, MoneyField
 from .money import Money
 from .utils import get_currency_field_name, prepare_expression
 
@@ -28,7 +29,7 @@ def _get_clean_name(name):
 
 
 def _get_field(model, name):
-    from django.db.models.fields import FieldDoesNotExist
+    from django.core.exceptions import FieldDoesNotExist
 
     # Create a fake query object so we can easily work out what field
     # type we are dealing with
@@ -100,7 +101,7 @@ def _expand_money_args(model, args):
                         clean_name = _get_clean_name(name)
                         arg.children[i] = Q(*[
                             child,
-                            (get_currency_field_name(clean_name), smart_unicode(value.currency))
+                            (get_currency_field_name(clean_name), smart_str(value.currency))
                         ])
                     field = _get_field(model, name)
                     if isinstance(value, (BaseExpression, F)):
@@ -126,7 +127,7 @@ def _expand_money_kwargs(model, args=(), kwargs=None, exclusions=()):
         if isinstance(value, Money):
             clean_name = _get_clean_name(name)
             kwargs[name] = value.amount
-            kwargs[get_currency_field_name(clean_name)] = smart_unicode(value.currency)
+            kwargs[get_currency_field_name(clean_name)] = smart_str(value.currency)
         else:
             field = _get_field(model, name)
             if isinstance(field, MoneyField):
