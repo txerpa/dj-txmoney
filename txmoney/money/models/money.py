@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
@@ -15,6 +13,9 @@ from ..exceptions import (
 )
 
 
+DEFAULT_CURRENCY_DECIMALS = 2
+
+
 class Currency(object):
     """
     A Currency represents a form of money issued by governments, and
@@ -23,7 +24,7 @@ class Currency(object):
     canonical name, the currency symbol, used decimals and countries the currency is used in.
     """
 
-    def __init__(self, code, numeric='', name='', symbol='', decimals=2, countries=None):
+    def __init__(self, code, numeric='', name='', symbol='', decimals=DEFAULT_CURRENCY_DECIMALS, countries=None):
         if not countries:
             countries = []
         self.code = code
@@ -63,6 +64,21 @@ class Currency(object):
         Get all system currencies.
         """
         return CURRENCIES
+
+    def deconstruct(self):
+        args = [self.code]
+        kwargs = dict()
+        if self.numeric != '':
+            kwargs.update(numeric=self.numeric)
+        if self.name != '':
+            kwargs.update(name=self.name)
+        if self.symbol != '':
+            kwargs.update(symbol=self.symbol)
+        if self.decimals != DEFAULT_CURRENCY_DECIMALS:
+            kwargs.update(decimals=self.decimals)
+        if self.countries is not None:
+            kwargs.update(countries=self.countries)
+        return 'txmoney.money.Currency', args, kwargs
 
 
 class Money(object):
@@ -309,6 +325,11 @@ class Money(object):
         amount = self._amount * exchange_ratio(self._currency, currency, rate_date)
 
         return self.__class__(amount, currency)
+
+    def deconstruct(self):
+        args = []
+        kwargs = dict(amount=self._amount, currency=self._currency)
+        return 'txmoney.money.Money', args, kwargs
 
 
 # Definitions of ISO 4217 Currencies
