@@ -10,7 +10,6 @@ from django.db.models.expressions import (
     BaseExpression, Expression, F, Func, Value
 )
 from django.db.models.signals import class_prepared
-from django.utils.six import string_types
 
 from ...compat import setup_managers
 from ...settings import txmoney_settings as settings
@@ -18,10 +17,7 @@ from ..exceptions import NotSupportedLookup
 from .money import Currency, Money
 from .utils import get_currency_field_name, prepare_expression
 
-try:
-    from django.utils.encoding import smart_unicode
-except ImportError:
-    from django.utils.encoding import smart_text as smart_unicode
+from django.utils.encoding import smart_str
 
 
 __all__ = 'MoneyField'
@@ -34,7 +30,7 @@ def get_currency(value):
     Extracts currency from value.
     """
     if isinstance(value, Money):
-        return smart_unicode(value.currency)
+        return smart_str(value.currency)
     elif isinstance(value, (list, tuple)):
         return value[1]
 
@@ -95,7 +91,7 @@ def setup_default(default, default_currency, nullable):
     if default is None and not nullable:
         # Backwards compatible fix for non-nullable fields
         default = '0.0'
-    if isinstance(default, string_types):
+    if isinstance(default, str):
         try:
             # handle scenario where default is formatted like:
             # 'amount currency-code'
@@ -139,7 +135,7 @@ class MoneyFieldProxy(object):
 
     def __get__(self, obj, *args):
         if obj is None:
-            raise AttributeError('Can only be accessed via an instance.')
+            return self
         data = obj.__dict__
         if isinstance(data[self.field.name], BaseExpression):
             return data[self.field.name]

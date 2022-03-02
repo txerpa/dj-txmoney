@@ -1,9 +1,8 @@
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
-from django.utils.encoding import smart_text
-from django.utils.six import string_types
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext_lazy as _
 
 from ...rates.utils import exchange_ratio
 from ...settings import txmoney_settings as settings
@@ -40,7 +39,7 @@ class Currency(object):
     def __eq__(self, other):
         if isinstance(other, Currency):
             return self.code and other.code and self.code == other.code
-        if isinstance(other, string_types):
+        if isinstance(other, str):
             return self.code == other
         return False
 
@@ -115,7 +114,7 @@ class Money(object):
             self._amount = amount
         else:
             try:
-                self._amount = Decimal(smart_text(amount).strip())
+                self._amount = Decimal(smart_str(amount).strip())
             except InvalidOperation:
                 try:
                     # check for the odd case of Money("123.00 EUR", "USD")

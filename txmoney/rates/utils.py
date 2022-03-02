@@ -3,7 +3,7 @@
 from datetime import date
 from decimal import Decimal
 
-from django.utils.six import iteritems
+from six import iteritems
 
 from ..settings import txmoney_settings
 from .models import Rate

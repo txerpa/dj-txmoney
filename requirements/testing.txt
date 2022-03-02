@@ -1,10 +1,10 @@
 # PyTest for running the tests.
-pytest==3.0.5
-pytest-django==3.1.2
-pytest-cov==2.4.0
+pytest==4.6.3
+pytest-django==3.5.0
+pytest-cov==2.7.1
 
-# Mock por python2
-mock==2.0.0
+# Mocking
+mock==3.0.5
 
 # Tox for running the tests in multiple environments.
 tox==2.5.0
