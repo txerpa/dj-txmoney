@@ -2,59 +2,53 @@
 """
 This module is largely inspired by django-rest_framework-framework settings.
 
-Settings for txdmoney are all namespaced in the TXDMONEY setting.
+Settings for TXMoney are all namespaced in the TXMONEY setting.
 For example your project's `settings.py` file might look like this:
 
-TXDMONEY = {
-    'DEFAULT_BACKEND': 'txdmoney.backends.OpenExchangeBackend',
-    'BASE_CURRENCY': 'EUR'
-    'BACKEND_KEY': '00000000000000'
+TXMONEY = {
+    'DEFAULT_BACKEND_CLASS': 'txmoney.rates.backends.OpenExchangeBackend',
+    'BASE_CURRENCY': 'EUR',
+    'OPENEXCHANGE': {
+        'app_id': '<some_app_id>'
+    }
 }
 
 This module provides the `txmoney_settings` object, that is used to access
-txdmoney settings, checking for user settings first, then falling
+TXMoney settings, checking for user settings first, then falling
 back to the defaults.
 """
-from __future__ import absolute_import, unicode_literals
 
-import importlib
-
-import six
+from importlib import import_module
 
 from django.conf import settings
-
-USER_SETTINGS = getattr(settings, str('TXMONEY'), None)
+from django.core.signals import setting_changed
+from django.utils.six import string_types
 
 DEFAULTS = {
-    'DEFAULT_BACKEND': 'txmoney.rates.backends.OpenExchangeBackend',
-    'BASE_CURRENCY': 'USD',
-    'BACKEND_KEY': '',
+    'DEFAULT_BACKEND_CLASS': 'txmoney.rates.backends.OpenExchangeBackend',
+    'DEFAULT_CURRENCY': 'USD',
     'SAME_BASE_CURRENCY': True,
 
     'OPENEXCHANGE_NAME': 'openexchangerates.org',
     'OPENEXCHANGE_URL': 'https://openexchangerates.org/api/latest.json',
     'OPENEXCHANGE_BASE_CURRENCY': 'USD',
+    'OPENEXCHANGE_APP_ID': '',
 }
-
-# List of settings that cannot be empty
-MANDATORY = (
-    'DEFAULT_BACKEND',
-    'BACKEND_KEY',
-)
 
 # List of settings that may be in string import notation.
 IMPORT_STRINGS = (
-    'DEFAULT_BACKEND',
+    'DEFAULT_BACKEND_CLASS',
 )
 
 
 def perform_import(val, setting_name):
     """
-    If the given setting is a string import notation, then perform the necessary import or imports.
-    :param val: setting value
-    :param setting_name: setting name
+    If the given setting is a string import notation,
+    then perform the necessary import or imports.
     """
-    if isinstance(val, six.string_types):
+    if val is None:
+        return None
+    elif isinstance(val, string_types):
         return import_from_string(val, setting_name)
     elif isinstance(val, (list, tuple)):
         return [import_from_string(item, setting_name) for item in val]
@@ -64,35 +58,43 @@ def perform_import(val, setting_name):
 def import_from_string(val, setting_name):
     """
     Attempt to import a class from a string representation.
-    :param val: setting value
-    :param setting_name: setting name
     """
     try:
         parts = val.split('.')
         module_path, class_name = '.'.join(parts[:-1]), parts[-1]
-        module = importlib.import_module(module_path)
+        module = import_module(module_path)
         return getattr(module, class_name)
-    except ImportError as e:
-        msg = 'Could not import "{}" for setting "{}". {}: {}.'.format(val, setting_name, e.__class__.__name__, e)
+    except (ImportError, AttributeError) as exp:
+        msg = f'Could not import "{val}" for TXMONEY setting "{setting_name}". {exp.__class__.__name__}: {exp}.'
         raise ImportError(msg)
 
 
-class TXMoneySettings:
+class TXMoneySettings(object):
     """
-    A settings object, that allows txdmoney settings to be accessed as properties.
+    A settings object, that allows TXMoney settings to be accessed as properties.
+    For example:
+
+        from txmoney.settings import txmoney_settings
+        print(txmoney_settings.DEFAULT_RENDERER_CLASSES)
+
     Any setting with string import paths will be automatically resolved
     and return the class, rather than the string literal.
     """
+    def __init__(self, user_settings=None, defaults=None, import_strings=None):
+        if user_settings:
+            self._user_settings = user_settings
+        self.defaults = defaults or DEFAULTS
+        self.import_strings = import_strings or IMPORT_STRINGS
 
-    def __init__(self, user_settings=None, defaults=None, import_strings=None, mandatory=None):
-        self.user_settings = user_settings or {}
-        self.defaults = defaults or {}
-        self.import_strings = import_strings or ()
-        self.mandatory = mandatory or ()
+    @property
+    def user_settings(self):
+        if not hasattr(self, '_user_settings'):
+            self._user_settings = getattr(settings, 'TXMONEY', {})
+        return self._user_settings
 
     def __getattr__(self, attr):
-        if attr not in self.defaults.keys():
-            raise AttributeError('Invalid txmoney setting: "{}"'.format(attr))
+        if attr not in self.defaults:
+            raise AttributeError(f'Invalid TXMoney setting: "{attr}')
 
         try:
             # Check if present in user settings
@@ -105,15 +107,19 @@ class TXMoneySettings:
         if val and attr in self.import_strings:
             val = perform_import(val, attr)
 
-        self.validate_setting(attr, val)
-
         # Cache the result
         setattr(self, attr, val)
         return val
 
-    def validate_setting(self, attr, val):
-        if not val and attr in self.mandatory:
-            raise AttributeError('txmoney setting: "{}" is mandatory'.format(attr))
+
+txmoney_settings = TXMoneySettings(None, DEFAULTS, IMPORT_STRINGS)
 
 
-txmoney_settings = TXMoneySettings(USER_SETTINGS, DEFAULTS, IMPORT_STRINGS, MANDATORY)
+def reload_api_settings(**kwargs):
+    global txmoney_settings
+    setting, value = kwargs['setting'], kwargs['value']
+    if setting == 'TXMONEY':
+        txmoney_settings = TXMoneySettings(value, DEFAULTS, IMPORT_STRINGS)
+
+
+setting_changed.connect(reload_api_settings)

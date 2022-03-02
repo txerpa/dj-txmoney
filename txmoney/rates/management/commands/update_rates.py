@@ -1,29 +1,29 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from django.core.management.base import BaseCommand, CommandError
 
-from txmoney.settings import txmoney_settings as settings
-from txmoney.settings import import_from_string
+from ....settings import import_from_string, txmoney_settings
 
 
 class Command(BaseCommand):
-    args = '<backend_path>'
-    help = 'Actualiza tarifas para el origen configurado'
+    help = "Gets the day's exchange rates"
+
+    def add_arguments(self, parser):
+        parser.add_argument('backend_path', nargs='?', help="Exchange backend class")
 
     def handle(self, *args, **options):
-        if args:
+        if options['backend_path']:
             try:
-                backend_class = import_from_string(args[0], '')
+                backend_class = import_from_string(options['backend_path'], '')
             except AttributeError:
-                raise CommandError('Cannot find custom backend {}. Is it correct'.format(args[0]))
+                raise CommandError(f'Cannot find custom backend "{options["backend_path"]}". Is it correct')
         else:
-            backend_class = settings.DEFAULT_BACKEND
+            backend_class = txmoney_settings.DEFAULT_BACKEND_CLASS
 
+        backend = backend_class()
         try:
-            backend = backend_class()
             backend.update_rates()
         except Exception as e:
-            raise CommandError('Error during rate update: {}'.format(e))
+            raise CommandError(f'{e}')
 
-        self.stdout.write('Successfully updated rates for "{}"'.format(backend_class))
+        self.stdout.write(f'Successfully updated rates for "{backend.source_name}"')

@@ -1,1 +1,3 @@
-default_app_config = 'txmoney.rest.apps.TXMoneyRestAppConfig'
+# coding=utf-8
+
+default_app_config = 'txmoney.rates.apps.TXMoneyRatesConfig'

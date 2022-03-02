@@ -1,12 +1,10 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
 from django.utils.translation import ugettext_lazy as _
-
 from rest_framework.fields import Field
 
-from txmoney.money import Money
-from txmoney.money.exceptions import IncorrectMoneyInputError
+from ..money.exceptions import IncorrectMoneyInputError
+from ..money.models import Money
 
 
 class MoneyField(Field):
@@ -58,7 +56,7 @@ class MoneyField(Field):
         Override this method to disable the precision validation for input
         values or to enhance it in any way you need to.
         """
-        sign, digittuple, exponent = value.amount.as_tuple()
+        _, digittuple, exponent = value.amount.as_tuple()
 
         if exponent >= 0:
             # 1234500.0

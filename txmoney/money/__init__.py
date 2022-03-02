@@ -1,1 +1,1 @@
-from .money import Money  # noqa
+from .models.money import Money, Currency

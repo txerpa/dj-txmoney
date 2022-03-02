@@ -1,0 +1,5 @@
+# Bump version for version number automatic increments
+bumpversion==0.5.3
+
+# Wheel for PyPI installs.
+wheel==0.29.0

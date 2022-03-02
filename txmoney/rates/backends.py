@@ -1,42 +1,34 @@
 # coding=utf-8
-from __future__ import absolute_import, unicode_literals
 
-import json
 from abc import ABCMeta, abstractmethod
 from decimal import Decimal
 
+import requests
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
-
-from six import iteritems, with_metaclass
-
-from six.moves.urllib.request import urlopen
+from django.utils.six import iteritems, with_metaclass
 
 from ..settings import txmoney_settings as settings
-from ..utils import parse_rates_to_base_currency
 from .exceptions import TXRateBackendError
 from .models import Rate, RateSource
+from .utils import parse_rates_to_base_currency
 
 
 class BaseRateBackend(with_metaclass(ABCMeta)):
-    """Abstract base class API for exchange backends"""
-
-    _source_name = None
-    _base_currency = None
+    """
+    Abstract base class API for exchange backends
+    """
 
     def __init__(self, source_name, base_currency):
-        # TODO: validate currency
         self._source_name = source_name
         self._base_currency = base_currency
 
     @property
     def source_name(self):
-        """Return the source backend name"""
         return self._source_name
 
     @property
     def base_currency(self):
-        """Return the base currency"""
         return self._base_currency
 
     @abstractmethod
@@ -59,10 +51,9 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
                     rates.append(Rate(source=source, currency=currency, value=value))
 
                 Rate.objects.bulk_create(rates)
-                # Force update last_update date on origin
-                source.save()
-        except Exception:
-            raise TXRateBackendError('Error during {} rates update'.format(self.source_name))
+                source.save()  # Force update last_update date on rate source
+        except Exception as e:
+            raise TXRateBackendError(f'Error during "{self.source_name}" rates update. {e}')
 
 
 class OpenExchangeBackend(BaseRateBackend):
@@ -72,22 +63,21 @@ class OpenExchangeBackend(BaseRateBackend):
         )
 
         if not settings.OPENEXCHANGE_URL:
-            raise ImproperlyConfigured('OPENEXCHANGE_URL setting should not be empty when using OpenExchangeBackend')
+            raise ImproperlyConfigured('OPENEXCHANGE URL setting should not be empty when using OpenExchangeBackend')
 
-        if not settings.BACKEND_KEY:
-            raise ImproperlyConfigured('BACKEND_KEY setting should not be empty when using OpenExchangeBackend')
+        if not settings.OPENEXCHANGE_APP_ID:
+            raise ImproperlyConfigured('OPENEXCHANGE APP_ID setting should not be empty when using OpenExchangeBackend')
 
-        self.url = '{}?app_id={}'.format(settings.OPENEXCHANGE_URL, settings.BACKEND_KEY)
+        self.url = f'{settings.OPENEXCHANGE_URL}?app_id={settings.OPENEXCHANGE_APP_ID}'
 
     def get_rates_from_source(self):
         try:
-            data = urlopen(self.url).read().decode("utf-8")
-            rates = json.loads(data, parse_float=Decimal)['rates']
-            # rates = clean_rates(rates) TODO: clean rates
+            r = requests.get(self.url)
+            rates = r.json(parse_float=Decimal)['rates']
 
-            if settings.SAME_BASE_CURRENCY and settings.BASE_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
-                rates = parse_rates_to_base_currency(rates, settings.BASE_CURRENCY)
-        except Exception:
-            raise TXRateBackendError('Error retrieving data from {}'.format(self.url))
+            if settings.SAME_BASE_CURRENCY and settings.DEFAULT_CURRENCY != settings.OPENEXCHANGE_BASE_CURRENCY:
+                rates = parse_rates_to_base_currency(rates, settings.OPENEXCHANGE_BASE_CURRENCY)
+        except Exception as e:
+            raise TXRateBackendError(f'Error retrieving rates from "{self.url}". {e}')
 
         return rates

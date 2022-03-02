@@ -1,0 +1,2 @@
+# Optional packages which may be used with TXMoney.
+djangorestframework>=3.1.0
