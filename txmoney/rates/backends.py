@@ -1,12 +1,9 @@
-# coding=utf-8
-
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from decimal import Decimal
 
 import requests
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
-from django.utils.six import iteritems, with_metaclass
 
 from ..settings import txmoney_settings as settings
 from .exceptions import TXRateBackendError
@@ -14,7 +11,7 @@ from .models import Rate, RateSource
 from .utils import parse_rates_to_base_currency
 
 
-class BaseRateBackend(with_metaclass(ABCMeta)):
+class BaseRateBackend(ABC):
     """
     Abstract base class API for exchange backends
     """
@@ -47,7 +44,7 @@ class BaseRateBackend(with_metaclass(ABCMeta)):
 
             if created or not source.is_updated:
                 rates = []
-                for currency, value in iteritems(self.get_rates_from_source()):
+                for currency, value in self.get_rates_from_source().items():
                     rates.append(Rate(source=source, currency=currency, value=value))
 
                 Rate.objects.bulk_create(rates)

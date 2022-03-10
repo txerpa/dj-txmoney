@@ -46,7 +46,8 @@ SITE_ID = 1
 
 TXMONEY = {
     "DEFAULT_CURRENCY": "EUR",
-    "OPENEXCHANGE_APP_ID": os.environ.get("OPENEXCHANGE_APP_ID")
+    "OPENEXCHANGE_APP_ID": os.environ.get("OPENEXCHANGE_APP_ID", 'fake-key')
 }
 
 USE_TZ = True
+
